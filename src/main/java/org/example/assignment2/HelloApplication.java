@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class HelloApplication extends Application {
 
@@ -32,6 +33,8 @@ public class HelloApplication extends Application {
 
         // row for emp first and last name
         HBox rowName = new HBox(10);
+        rowName.setStyle("-fx-background-color: lightblue;");
+
         rowName.setPadding(new Insets(10,10,10,10));
         rowName.getChildren().addAll(lblFirstName,empFirstName,lblLastName,empLastName);
 
@@ -39,6 +42,10 @@ public class HelloApplication extends Application {
         rootBox.getChildren().addAll(rowName);
 
         Scene scene = new Scene(rootBox,600, 400);
+
+        // FIXME not working correctly yet
+//        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
+
         stage.setScene(scene);
         stage.show();
     }

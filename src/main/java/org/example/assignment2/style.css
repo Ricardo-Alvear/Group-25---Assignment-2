@@ -1,0 +1,13 @@
+
+.hbox-odd {
+    -fx-background-color: lightblue;
+    -fx-padding: 10;
+    -fx-spacing: 10;
+    -fx-border-color: black;
+    -fx-border: 2 0 2 0;
+}
+
+
+
+
+
