@@ -189,9 +189,11 @@ public class HelloApplication extends Application {
         // Add employeePane, payrollPane and reportingPane to Accordion
         accordion.getPanes().addAll(employeesPane, payrollPane, reportingPane);
 
-        Scene scene = new Scene(accordion,1200, 600);
+        Scene scene = new Scene(accordion,1000, 600);
 
 
+        stage.setMinWidth(1000);
+        stage.setMinHeight(600);
         stage.setScene(scene);
         stage.show();
     }
