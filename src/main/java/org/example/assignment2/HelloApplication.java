@@ -37,7 +37,7 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage)  {
-//        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+//        FXMLLoader fxmlLoader1 = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
 
         stage.setTitle("Fun Time's HR Management and Payroll Processing!");
 
@@ -84,6 +84,25 @@ public class HelloApplication extends Application {
         rowButtons.getChildren().addAll(btnPrevEmployee, btnCreateEmployee, btnUpdateEmployee, btnDeleteEmployee, btnNextEmployee);
 
 
+        btnCreateEmployee.setOnAction(e -> {
+            System.out.println("Create Employee");
+        });
+
+        btnUpdateEmployee.setOnAction(e -> {
+            System.out.println("Update Employee");
+        });
+
+        btnDeleteEmployee.setOnAction(e -> {
+            System.out.println("Delete Employee");
+        });
+
+        btnNextEmployee.setOnAction(e -> {
+            System.out.println("Next Employee");
+        });
+
+        btnPrevEmployee.setOnAction(e -> {
+            System.out.println("Previous Employee");
+        });
 
         // Add HBoxes to each
         rootBox.getChildren().addAll(rowName, rowEmail, rowPhone,  rowDepartment, rowSalary,  rowPosition,
