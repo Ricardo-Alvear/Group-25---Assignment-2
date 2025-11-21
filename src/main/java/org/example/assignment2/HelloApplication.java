@@ -15,10 +15,19 @@ import java.util.Objects;
 
 public class HelloApplication extends Application {
 
-    private Label lblFirstName = new Label("First Name:");
-    private Label lblLastName = new Label("Last Name:");
-    private TextField empFirstName = new TextField();
-    private TextField empLastName = new TextField();
+    private Label lblName = new Label("Name:");
+    private TextField empName = new TextField();
+    private Label lblEmail = new Label("Email:");
+    private TextField empEmail = new TextField();
+    private Label lblPhone = new Label("Phone Number:");
+    private TextField empPhone = new TextField();
+    private Label lblDepartment = new Label("Department:");
+    private TextField empDepartment = new TextField();
+    private Label lblSalary = new Label("Salary:");
+    private TextField empSalary = new TextField();
+    private Label lblPosition = new Label("Position:");
+    private TextField empPosition = new TextField();
+
 
 
     @Override
@@ -34,14 +43,38 @@ public class HelloApplication extends Application {
         // row for emp first and last name
         HBox rowName = new HBox(10);
         rowName.setStyle("-fx-background-color: lightblue;");
-
         rowName.setPadding(new Insets(10,10,10,10));
-        rowName.getChildren().addAll(lblFirstName,empFirstName,lblLastName,empLastName);
+        rowName.getChildren().addAll(lblName,empName);
+
+        HBox rowPhone = new HBox(10);
+        rowPhone.setStyle("-fx-background-color: lightgray;");
+        rowPhone.setPadding(new Insets(10,10,10,10));
+        rowPhone.getChildren().addAll(lblPhone,empPhone,lblDepartment,lblSalary,lblPosition);
+
+        HBox rowDepartment = new HBox(10);
+        rowDepartment.setStyle("-fx-background-color: lightblue;");
+        rowDepartment.setPadding(new Insets(10,10,10,10));
+        rowDepartment.getChildren().addAll(lblDepartment, empDepartment);
+
+        HBox rowSalary = new HBox(10);
+        rowSalary.setStyle("-fx-background-color: lightgray;");
+        rowSalary.setPadding(new Insets(10,10,10,10));
+        rowSalary.getChildren().addAll(lblSalary,empSalary);
+
+        HBox rowPosition = new HBox(10);
+        rowPosition.setStyle("-fx-background-color: lightblue;");
+        rowPosition.setPadding(new Insets(10,10,10,10));
+        rowPosition.getChildren().addAll(lblPosition, empPosition);
+
+        HBox rowButtons = new HBox(10);
+        rowButtons.setStyle("-fx-background-color: lightyellow;");
+        rowButtons.setPadding(new Insets(10,10,10,10));
+
 
         // Add HBoxes to each
-        rootBox.getChildren().addAll(rowName);
+        rootBox.getChildren().addAll(rowName, rowPhone,  rowDepartment, rowSalary,  rowPosition);
 
-        Scene scene = new Scene(rootBox,600, 400);
+        Scene scene = new Scene(rootBox,800, 600);
 
         // FIXME not working correctly yet
 //        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
