@@ -3,7 +3,9 @@ package org.example.assignment2;
 import javafx.application.Application;
 //import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -28,7 +30,11 @@ public class HelloApplication extends Application {
     private final Label lblPosition = new Label("Position:");
     private final TextField empPosition = new TextField();
 
-
+    private final Button btnCreateEmployee = new Button("Create Employee");
+    private final Button btnUpdateEmployee = new Button("Update Employee");
+    private final Button btnDeleteEmployee = new Button("Delete Employee");
+    private final Button btnNextEmployee = new Button("Next Employee");
+    private final Button btnPrevEmployee = new Button("Previous Employee");
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -52,33 +58,37 @@ public class HelloApplication extends Application {
         rowEmail.getChildren().addAll(lblEmail,empEmail);
 
         HBox rowPhone = new HBox(10);
-        rowPhone.setStyle("-fx-background-color: lightgray;");
+        rowPhone.setStyle("-fx-background-color: lightblue;");
         rowPhone.setPadding(new Insets(10,10,10,10));
         rowPhone.getChildren().addAll(lblPhone,empPhone);
 
 
         HBox rowDepartment = new HBox(10);
-        rowDepartment.setStyle("-fx-background-color: lightblue;");
+        rowDepartment.setStyle("-fx-background-color: lightgray;");
         rowDepartment.setPadding(new Insets(10,10,10,10));
         rowDepartment.getChildren().addAll(lblDepartment, empDepartment);
 
         HBox rowSalary = new HBox(10);
-        rowSalary.setStyle("-fx-background-color: lightgray;");
+        rowSalary.setStyle("-fx-background-color: lightblue;");
         rowSalary.setPadding(new Insets(10,10,10,10));
         rowSalary.getChildren().addAll(lblSalary,empSalary);
 
         HBox rowPosition = new HBox(10);
-        rowPosition.setStyle("-fx-background-color: lightblue;");
+        rowPosition.setStyle("-fx-background-color: lightgray;");
         rowPosition.setPadding(new Insets(10,10,10,10));
         rowPosition.getChildren().addAll(lblPosition, empPosition);
 
         HBox rowButtons = new HBox(10);
         rowButtons.setStyle("-fx-background-color: lightyellow;");
         rowButtons.setPadding(new Insets(10,10,10,10));
+        rowButtons.setAlignment(Pos.CENTER);
+        rowButtons.getChildren().addAll(btnPrevEmployee, btnCreateEmployee, btnUpdateEmployee, btnDeleteEmployee, btnNextEmployee);
+
 
 
         // Add HBoxes to each
-        rootBox.getChildren().addAll(rowName, rowPhone,  rowDepartment, rowSalary,  rowPosition);
+        rootBox.getChildren().addAll(rowName, rowEmail, rowPhone,  rowDepartment, rowSalary,  rowPosition,
+                rowButtons);
 
         Scene scene = new Scene(rootBox,800, 600);
 
