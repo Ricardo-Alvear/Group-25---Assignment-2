@@ -11,22 +11,22 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Objects;
+//import java.util.Objects;
 
 public class HelloApplication extends Application {
 
-    private Label lblName = new Label("Name:");
-    private TextField empName = new TextField();
-    private Label lblEmail = new Label("Email:");
-    private TextField empEmail = new TextField();
-    private Label lblPhone = new Label("Phone Number:");
-    private TextField empPhone = new TextField();
-    private Label lblDepartment = new Label("Department:");
-    private TextField empDepartment = new TextField();
-    private Label lblSalary = new Label("Salary:");
-    private TextField empSalary = new TextField();
-    private Label lblPosition = new Label("Position:");
-    private TextField empPosition = new TextField();
+    private final Label lblName = new Label("Name:");
+    private final TextField empName = new TextField();
+    private final Label lblEmail = new Label("Email:");
+    private final TextField empEmail = new TextField();
+    private final Label lblPhone = new Label("Phone Number:");
+    private final TextField empPhone = new TextField();
+    private final Label lblDepartment = new Label("Department:");
+    private final TextField empDepartment = new TextField();
+    private final Label lblSalary = new Label("Salary:");
+    private final TextField empSalary = new TextField();
+    private final Label lblPosition = new Label("Position:");
+    private final TextField empPosition = new TextField();
 
 
 
@@ -46,10 +46,16 @@ public class HelloApplication extends Application {
         rowName.setPadding(new Insets(10,10,10,10));
         rowName.getChildren().addAll(lblName,empName);
 
+        HBox rowEmail = new HBox(10);
+        rowEmail.setStyle("-fx-background-color: lightgray;");
+        rowEmail.setPadding(new Insets(10,10,10,10));
+        rowEmail.getChildren().addAll(lblEmail,empEmail);
+
         HBox rowPhone = new HBox(10);
         rowPhone.setStyle("-fx-background-color: lightgray;");
         rowPhone.setPadding(new Insets(10,10,10,10));
-        rowPhone.getChildren().addAll(lblPhone,empPhone,lblDepartment,lblSalary,lblPosition);
+        rowPhone.getChildren().addAll(lblPhone,empPhone);
+
 
         HBox rowDepartment = new HBox(10);
         rowDepartment.setStyle("-fx-background-color: lightblue;");
