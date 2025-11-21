@@ -12,7 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 //import java.util.Objects;
 
 public class HelloApplication extends Application {
@@ -37,7 +36,7 @@ public class HelloApplication extends Application {
     private final Button btnPrevEmployee = new Button("Previous Employee");
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage)  {
 //        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
 
         stage.setTitle("Fun Time's HR Management and Payroll Processing!");
