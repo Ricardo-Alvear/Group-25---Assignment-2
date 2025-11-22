@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -33,13 +34,13 @@ public class HelloApplication extends Application {
     private final Button btnNextEmployee = new Button("Next Employee");
     private final Button btnPrevEmployee = new Button("Previous Employee");
 
-    private final Label lblPayrollResults = new Label();
+    private final TextArea txtPayrollResults = new TextArea();
 
     private final Button btnCalculateSalaries = new Button("Calculate Salaries");
     private final Button btnCalculateTaxes = new Button("Calculate Taxes");
-    private final Button btnCalculateDeductions = new Button("Calculate Salaries");
+    private final Button btnCalculateDeductions = new Button("Calculate Deductions");
 
-    private final Label lblReportingResults = new Label();
+    private final TextArea txtReportingResults = new TextArea();
 
     private final Button btnCalculateEmpReport = new Button("Calculate Employee Report");
     private final Button btnCalculateDeptReport = new Button("Calculate Department Report");
@@ -62,36 +63,48 @@ public class HelloApplication extends Application {
         HBox rowName = new HBox(10);
         rowName.setStyle("-fx-background-color: lightblue;");
         rowName.setPadding(new Insets(10,10,10,10));
+        rowName.setHgrow(empName, Priority.ALWAYS);
+        empName.setMaxWidth(300);
         rowName.getChildren().addAll(lblName,empName);
 
         HBox rowEmail = new HBox(10);
-        rowEmail.setStyle("-fx-background-color: lightgray;");
+        rowEmail.setStyle("-fx-background-color: #87CEEB;");
         rowEmail.setPadding(new Insets(10,10,10,10));
+        rowEmail.setHgrow(empEmail, Priority.ALWAYS);
+        empEmail.setMaxWidth(300);
         rowEmail.getChildren().addAll(lblEmail,empEmail);
 
         HBox rowPhone = new HBox(10);
         rowPhone.setStyle("-fx-background-color: lightblue;");
         rowPhone.setPadding(new Insets(10,10,10,10));
+        rowPhone.setHgrow(empPhone, Priority.ALWAYS);
+        empPhone.setMaxWidth(300);
         rowPhone.getChildren().addAll(lblPhone,empPhone);
 
 
         HBox rowDepartment = new HBox(10);
-        rowDepartment.setStyle("-fx-background-color: lightgray;");
+        rowDepartment.setStyle("-fx-background-color: #87CEEB;");
         rowDepartment.setPadding(new Insets(10,10,10,10));
+        rowDepartment.setHgrow(empDepartment, Priority.ALWAYS);
+        empDepartment.setMaxWidth(300);
         rowDepartment.getChildren().addAll(lblDepartment, empDepartment);
 
         HBox rowSalary = new HBox(10);
         rowSalary.setStyle("-fx-background-color: lightblue;");
         rowSalary.setPadding(new Insets(10,10,10,10));
+        rowSalary.setHgrow(empSalary, Priority.ALWAYS);
+        empSalary.setMaxWidth(300);
         rowSalary.getChildren().addAll(lblSalary,empSalary);
 
         HBox rowPosition = new HBox(10);
-        rowPosition.setStyle("-fx-background-color: lightgray;");
+        rowPosition.setStyle("-fx-background-color: #87CEEB;");
         rowPosition.setPadding(new Insets(10,10,10,10));
+        rowPosition.setHgrow(empPosition, Priority.ALWAYS);
+        empPosition.setMaxWidth(300);
         rowPosition.getChildren().addAll(lblPosition, empPosition);
 
         HBox rowButtons = new HBox(10);
-        rowButtons.setStyle("-fx-background-color: lightyellow;");
+        rowButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowButtons.setPadding(new Insets(10,10,10,10));
         rowButtons.setAlignment(Pos.CENTER);
         rowButtons.getChildren().addAll(btnPrevEmployee, btnCreateEmployee, btnUpdateEmployee, btnDeleteEmployee, btnNextEmployee);
@@ -129,19 +142,31 @@ public class HelloApplication extends Application {
 
         // row for Payroll Results
         HBox rowPayrollResults = new HBox(10);
-        rowPayrollResults.setStyle("-fx-background-color: lightgrey;");
+        rowPayrollResults.setStyle("-fx-background-color: #87CEEB;");
         rowPayrollResults.setPadding(new Insets(10,10,10,10));
-        rowPayrollResults.getChildren().addAll(lblPayrollResults);
+        txtPayrollResults.setEditable(false);
+        txtPayrollResults.setWrapText(true);
+
+        VBox.setVgrow(rowPayrollResults, Priority.ALWAYS);
+        rowPayrollResults.setMaxHeight(Double.MAX_VALUE);
+
+        HBox.setHgrow(txtPayrollResults, Priority.ALWAYS);
+        txtPayrollResults.setMaxWidth(Double.MAX_VALUE);
+
+        VBox.setVgrow(txtPayrollResults, Priority.ALWAYS);
+        txtPayrollResults.setMaxHeight(Double.MAX_VALUE);
+
+        rowPayrollResults.getChildren().add(txtPayrollResults);
+
 
         HBox rowPayrollButtons = new HBox(10);
-        rowPayrollButtons.setStyle("-fx-background-color: lightyellow;");
+        rowPayrollButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowPayrollButtons.setPadding(new Insets(10,10,10,10));
         rowPayrollButtons.setAlignment(Pos.CENTER);
         rowPayrollButtons.getChildren().addAll(btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions);
 
         // Add HBoxes to each payrollBox
         payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
-
 
         btnCalculateSalaries.setOnAction(e -> {
             System.out.println("Calculate Salaries");
@@ -164,10 +189,23 @@ public class HelloApplication extends Application {
         HBox rowReportingResults = new HBox(10);
         rowReportingResults.setStyle("-fx-background-color: lightblue;");
         rowReportingResults.setPadding(new Insets(10,10,10,10));
-        rowReportingResults.getChildren().addAll(lblReportingResults);
+
+        txtReportingResults.setEditable(false);
+        txtReportingResults.setWrapText(true);
+
+        HBox.setHgrow(txtReportingResults, Priority.ALWAYS);
+        txtReportingResults.setMaxWidth(Double.MAX_VALUE);
+
+        VBox.setVgrow(rowReportingResults, Priority.ALWAYS);
+        rowReportingResults.setMaxHeight(Double.MAX_VALUE);
+
+
+        rowReportingResults.getChildren().add(txtReportingResults);
+
+
 
         HBox rowReportingButtons = new HBox(10);
-        rowReportingButtons.setStyle("-fx-background-color: lightyellow;");
+        rowReportingButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowReportingButtons.setPadding(new Insets(10,10,10,10));
         rowReportingButtons.setAlignment(Pos.CENTER);
         rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport);
