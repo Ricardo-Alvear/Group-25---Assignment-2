@@ -1,0 +1,29 @@
+[
+  {
+    "id": 4,
+    "name": "Test Four",
+    "email": "test04@test.com",
+    "phone": "004",
+    "department": "Testing",
+    "salary": 4000.0,
+    "position": "Tester"
+  },
+  {
+    "id": 5,
+    "name": "Test Five",
+    "email": "test05@test.com",
+    "phone": "005",
+    "department": "Testing",
+    "salary": 5000.0,
+    "position": "Tester"
+  },
+  {
+    "id": 6,
+    "name": "Test Six",
+    "email": "test06@test.com",
+    "phone": "006",
+    "department": "Testing",
+    "salary": 6000.0,
+    "position": "Tester"
+  }
+]

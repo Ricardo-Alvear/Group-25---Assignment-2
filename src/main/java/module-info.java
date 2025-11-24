@@ -4,6 +4,8 @@ module org.example.assignment2 {
 
     requires org.kordamp.bootstrapfx.core;
 
-    opens org.example.assignment2 to javafx.fxml;
+    requires com.google.gson;
+    opens org.example.assignment2 to com.google.gson, javafx.fxml;
+
     exports org.example.assignment2;
 }

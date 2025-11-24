@@ -1,5 +1,8 @@
 package org.example.assignment2;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import javafx.application.Application;
 //import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -10,6 +13,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 //import java.util.Objects;
 
@@ -48,9 +57,23 @@ public class HelloApplication extends Application {
 
     private final Accordion  accordion = new Accordion();
 
+    private ArrayList<Employee> employeeList;
+    private Employee currentEmployee;
+    private int currentEmployeeIndex;
+
     @Override
     public void start(Stage stage)  {
 //        FXMLLoader fxmlLoader1 = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+
+        employeeList = readEmployeeData();
+
+        currentEmployee = null;
+        currentEmployeeIndex = -1;
+
+        if (employeeList != null && !employeeList.isEmpty()) {
+            currentEmployee = employeeList.getFirst();
+            currentEmployeeIndex = employeeList.indexOf(currentEmployee);
+        }
 
         stage.setTitle("Fun Time's HR Management and Payroll Processing!");
 
@@ -65,6 +88,9 @@ public class HelloApplication extends Application {
         rowName.setPadding(new Insets(10,10,10,10));
         rowName.setHgrow(empName, Priority.ALWAYS);
         empName.setMaxWidth(300);
+        if (currentEmployee != null) {
+            empName.setText(currentEmployee.getName());
+        }
         rowName.getChildren().addAll(lblName,empName);
 
         HBox rowEmail = new HBox(10);
@@ -72,6 +98,9 @@ public class HelloApplication extends Application {
         rowEmail.setPadding(new Insets(10,10,10,10));
         rowEmail.setHgrow(empEmail, Priority.ALWAYS);
         empEmail.setMaxWidth(300);
+        if (currentEmployee != null) {
+            empEmail.setText(currentEmployee.getEmail());
+        }
         rowEmail.getChildren().addAll(lblEmail,empEmail);
 
         HBox rowPhone = new HBox(10);
@@ -79,6 +108,9 @@ public class HelloApplication extends Application {
         rowPhone.setPadding(new Insets(10,10,10,10));
         rowPhone.setHgrow(empPhone, Priority.ALWAYS);
         empPhone.setMaxWidth(300);
+        if (currentEmployee != null) {
+            empPhone.setText(currentEmployee.getPhone());
+        }
         rowPhone.getChildren().addAll(lblPhone,empPhone);
 
 
@@ -87,6 +119,9 @@ public class HelloApplication extends Application {
         rowDepartment.setPadding(new Insets(10,10,10,10));
         rowDepartment.setHgrow(empDepartment, Priority.ALWAYS);
         empDepartment.setMaxWidth(300);
+        if (currentEmployee != null) {
+            empDepartment.setText(currentEmployee.getDepartment());
+        }
         rowDepartment.getChildren().addAll(lblDepartment, empDepartment);
 
         HBox rowSalary = new HBox(10);
@@ -94,6 +129,9 @@ public class HelloApplication extends Application {
         rowSalary.setPadding(new Insets(10,10,10,10));
         rowSalary.setHgrow(empSalary, Priority.ALWAYS);
         empSalary.setMaxWidth(300);
+        if (currentEmployee != null) {
+            empSalary.setText(String.valueOf(currentEmployee.getSalary()));
+        }
         rowSalary.getChildren().addAll(lblSalary,empSalary);
 
         HBox rowPosition = new HBox(10);
@@ -101,6 +139,9 @@ public class HelloApplication extends Application {
         rowPosition.setPadding(new Insets(10,10,10,10));
         rowPosition.setHgrow(empPosition, Priority.ALWAYS);
         empPosition.setMaxWidth(300);
+        if (currentEmployee != null) {
+            empPosition.setText(currentEmployee.getPosition());
+        }
         rowPosition.getChildren().addAll(lblPosition, empPosition);
 
         HBox rowButtons = new HBox(10);
@@ -112,22 +153,103 @@ public class HelloApplication extends Application {
 
         btnCreateEmployee.setOnAction(e -> {
             System.out.println("Create Employee");
+
+            int highestId = -1;
+
+            for (Employee employee : employeeList) {
+                if (employee.getId() > highestId) {
+                    highestId = employee.getId();
+                }
+            }
+
+            if (highestId == -1) {
+                highestId = 0;
+            }
+
+            Employee newEmployee = new Employee(highestId + 1, empName.getText(), empEmail.getText(), empPhone.getText(), empDepartment.getText(), Double.parseDouble(empSalary.getText()), empPosition.getText());
+            employeeList.add(newEmployee);
+
+            currentEmployee = employeeList.getLast();
+            currentEmployeeIndex = employeeList.indexOf(currentEmployee);
+
+            writeEmployeeData(employeeList);
         });
 
         btnUpdateEmployee.setOnAction(e -> {
             System.out.println("Update Employee");
+
+            currentEmployee.setName(empName.getText());
+            currentEmployee.setEmail(empEmail.getText());
+            currentEmployee.setPhone(empPhone.getText());
+            currentEmployee.setDepartment(empDepartment.getText());
+            currentEmployee.setSalary(Double.parseDouble(empSalary.getText()));
+            currentEmployee.setPosition(empPosition.getText());
+
+            writeEmployeeData(employeeList);
         });
 
         btnDeleteEmployee.setOnAction(e -> {
             System.out.println("Delete Employee");
+
+            employeeList.remove(currentEmployee);
+            writeEmployeeData(employeeList);
+
+            currentEmployee = null;
+            currentEmployeeIndex = -1;
+
+            if (employeeList != null && !employeeList.isEmpty()) {
+                currentEmployee = employeeList.getFirst();
+                currentEmployeeIndex = employeeList.indexOf(currentEmployee);
+
+                empName.setText(currentEmployee.getName());
+                empEmail.setText(currentEmployee.getEmail());
+                empPhone.setText(currentEmployee.getPhone());
+                empDepartment.setText(currentEmployee.getDepartment());
+                empSalary.setText(String.valueOf(currentEmployee.getSalary()));
+                empPosition.setText(currentEmployee.getPosition());
+            }
+            else {
+                empName.setText("");
+                empEmail.setText("");
+                empPhone.setText("");
+                empDepartment.setText("");
+                empSalary.setText("");
+                empPosition.setText("");
+            }
         });
 
         btnNextEmployee.setOnAction(e -> {
             System.out.println("Next Employee");
+
+            if (currentEmployeeIndex + 1 < employeeList.size()) {
+                currentEmployee = employeeList.get(currentEmployeeIndex + 1);
+
+                empName.setText(currentEmployee.getName());
+                empEmail.setText(currentEmployee.getEmail());
+                empPhone.setText(currentEmployee.getPhone());
+                empDepartment.setText(currentEmployee.getDepartment());
+                empSalary.setText(String.valueOf(currentEmployee.getSalary()));
+                empPosition.setText(currentEmployee.getPosition());
+
+                currentEmployeeIndex++;
+            }
         });
 
         btnPrevEmployee.setOnAction(e -> {
             System.out.println("Previous Employee");
+
+            if (currentEmployeeIndex - 1 >= 0) {
+                currentEmployee = employeeList.get(currentEmployeeIndex - 1);
+
+                empName.setText(currentEmployee.getName());
+                empEmail.setText(currentEmployee.getEmail());
+                empPhone.setText(currentEmployee.getPhone());
+                empDepartment.setText(currentEmployee.getDepartment());
+                empSalary.setText(String.valueOf(currentEmployee.getSalary()));
+                empPosition.setText(currentEmployee.getPosition());
+
+                currentEmployeeIndex--;
+            }
         });
 
 
@@ -234,5 +356,53 @@ public class HelloApplication extends Application {
         stage.setMinHeight(600);
         stage.setScene(scene);
         stage.show();
+    }
+
+    public ArrayList<Employee> readEmployeeData() {
+        System.out.println("Reading Employee Data...");
+
+        ArrayList<Employee> employeeList = new ArrayList<>();
+
+        try {
+            Gson gson = new Gson();
+
+            Type employeeListType = new TypeToken<ArrayList<Employee>>(){}.getType();
+            FileReader reader = new FileReader("employees.json");
+
+            employeeList = gson.fromJson(reader, employeeListType);
+
+            reader.close();
+
+            for (Employee e : employeeList) {
+                System.out.println(e);
+            }
+
+            System.out.println(employeeList.size() + " Employees read from employees.json");
+        }
+        catch (Exception e) {
+            System.out.println("Error Reading Employee Data");
+            e.printStackTrace();
+            employeeList = new ArrayList<>();
+        }
+
+        return employeeList;
+    }
+
+    public void writeEmployeeData(ArrayList<Employee> employeeList) {
+        System.out.println("Writing Employee Data...");
+
+        try {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            FileWriter writer = new FileWriter("employees.json");
+            gson.toJson(employeeList, writer);
+
+            writer.close();
+            System.out.println("Employees saved to employees.json");
+        }
+        catch (Exception e) {
+            System.out.println("Error Writing Employee Data");
+            e.printStackTrace();
+        }
     }
 }
