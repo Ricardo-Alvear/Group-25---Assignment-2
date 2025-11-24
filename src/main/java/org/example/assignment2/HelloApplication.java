@@ -36,6 +36,7 @@ public class HelloApplication extends Application {
     private final TextField empSalary = new TextField();
     private final Label lblPosition = new Label("Position:");
     private final TextField empPosition = new TextField();
+    private final Label lblOutput = new Label("");
 
     private final Button btnCreateEmployee = new Button("Create Employee");
     private final Button btnUpdateEmployee = new Button("Update Employee");
@@ -144,11 +145,19 @@ public class HelloApplication extends Application {
         }
         rowPosition.getChildren().addAll(lblPosition, empPosition);
 
+        HBox rowOutput = new HBox(10);
+        rowOutput.setStyle("-fx-background-color: #87CEEB;");
+        rowOutput.setPadding(new Insets(10,10,10,10));
+        rowOutput.setHgrow(lblOutput, Priority.ALWAYS);
+        rowOutput.setAlignment(Pos.CENTER);
+        rowOutput.getChildren().addAll(lblOutput);
+
         HBox rowButtons = new HBox(10);
         rowButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowButtons.setPadding(new Insets(10,10,10,10));
         rowButtons.setAlignment(Pos.CENTER);
-        rowButtons.getChildren().addAll(btnPrevEmployee, btnCreateEmployee, btnUpdateEmployee, btnDeleteEmployee, btnNextEmployee);
+        rowButtons.getChildren().addAll(btnPrevEmployee, btnCreateEmployee, btnUpdateEmployee,
+                btnDeleteEmployee, btnNextEmployee);
 
 
         btnCreateEmployee.setOnAction(e -> {
@@ -255,7 +264,7 @@ public class HelloApplication extends Application {
 
         // Add HBoxes to each rootBox
         rootBox.getChildren().addAll(rowName, rowEmail, rowPhone,  rowDepartment, rowSalary,  rowPosition,
-                rowButtons);
+                rowButtons, rowOutput);
 
 
         VBox payrollBox = new VBox(10);
