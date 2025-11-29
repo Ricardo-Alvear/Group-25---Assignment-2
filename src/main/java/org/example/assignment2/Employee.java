@@ -10,6 +10,8 @@ public class Employee {
     private double salary;
     protected String position;
 
+    protected Payroll payroll;
+
     public Employee(int id, String name, String email, String phone, String department, double salary, String position) {
         this.id = id;
         this.name = name;
@@ -18,6 +20,8 @@ public class Employee {
         this.department = department;
         this.salary = salary;
         this.position = position;
+
+        this.payroll = new Payroll(id, id, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     public int getId() {

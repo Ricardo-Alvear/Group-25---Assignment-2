@@ -44,9 +44,28 @@ public class HelloApplication extends Application {
     private final Button btnNextEmployee = new Button("Next Employee");
     private final Button btnPrevEmployee = new Button("Previous Employee");
 
+    private final Label lblPayName = new Label("Employee Name");
+    private final Label lblPayNameValue = new Label("");
+    private final Label lblRegularRate = new Label("Regular Hourly Rate:");
+    private final TextField payRegularRate = new TextField();
+    private final Label lblRegularHours = new Label("Regular Hourly Hours:");
+    private final TextField payRegularHours = new TextField();
+    private final Label lblOvertimeRate = new Label("Overtime Hourly Rate:");
+    private final TextField payOvertimeRate = new TextField();
+    private final Label lblOvertimeHours = new Label("Overtime Hourly Hours:");
+    private final TextField payOvertimeHours = new TextField();
+    private final Label lblBonus = new Label("Bonus:");
+    private final TextField payBonus = new TextField();
+    private final Label lblTaxPercentage = new Label("Tax Percentage:");
+    private final TextField payTaxPercentage = new TextField();
+    private final Label lblDeductions = new Label("Other Deductions:");
+    private final TextField payDeductions = new TextField();
+    private final Label lblPayrollOutput = new Label("");
+
     private final TextArea txtPayrollResults = new TextArea();
 
-    private final Button btnCalculateSalaries = new Button("Calculate Salaries");
+    private final Button btnSavePayroll = new Button("Save Payroll");
+    private final Button btnCalculateSalaries = new Button("Calculate Salary");
     private final Button btnCalculateTaxes = new Button("Calculate Taxes");
     private final Button btnCalculateDeductions = new Button("Calculate Deductions");
 
@@ -62,9 +81,15 @@ public class HelloApplication extends Application {
     private Employee currentEmployee;
     private int currentEmployeeIndex;
 
+    private ArrayList<Payroll> payrollList;
+    private Payroll currentPayroll;
+    private int currentPayrollIndex;
+
     @Override
     public void start(Stage stage)  {
 //        FXMLLoader fxmlLoader1 = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+
+        // Load Employee Data
 
         employeeList = readEmployeeData();
 
@@ -74,7 +99,25 @@ public class HelloApplication extends Application {
         if (employeeList != null && !employeeList.isEmpty()) {
             currentEmployee = employeeList.getFirst();
             currentEmployeeIndex = employeeList.indexOf(currentEmployee);
+            lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+            lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
         }
+
+        // Load Payroll Data
+
+        /*
+        payrollList = readPayrollData();
+
+        currentPayroll = null;
+        currentPayrollIndex = -1;
+
+        if (payrollList != null && !payrollList.isEmpty()) {
+            currentPayroll = payrollList.getFirst();
+            currentPayrollIndex = payrollList.indexOf(currentPayroll);
+        }
+         */
+
+        // Main Program
 
         stage.setTitle("Fun Time's HR Management and Payroll Processing!");
 
@@ -182,6 +225,9 @@ public class HelloApplication extends Application {
             currentEmployeeIndex = employeeList.indexOf(currentEmployee);
 
             writeEmployeeData(employeeList);
+
+            lblOutput.setText("Created Employee (ID: " + currentEmployee.getId() + ")");
+            lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
         });
 
         btnUpdateEmployee.setOnAction(e -> {
@@ -194,11 +240,26 @@ public class HelloApplication extends Application {
             currentEmployee.setSalary(Double.parseDouble(empSalary.getText()));
             currentEmployee.setPosition(empPosition.getText());
 
+            currentEmployee.payroll.setRegularRate(Double.parseDouble(payRegularRate.getText()));
+            currentEmployee.payroll.setRegularHours(Double.parseDouble(payRegularHours.getText()));
+            currentEmployee.payroll.setOvertimeRate(Double.parseDouble(payOvertimeRate.getText()));
+            currentEmployee.payroll.setOvertimeHours(Double.parseDouble(payOvertimeHours.getText()));
+            currentEmployee.payroll.setBonus(Double.parseDouble(payBonus.getText()));
+            currentEmployee.payroll.setTaxPercentage(Double.parseDouble(payTaxPercentage.getText()));
+            currentEmployee.payroll.setDeductions(Double.parseDouble(payDeductions.getText()));
+
+            lblPayNameValue.setText(currentEmployee.getName());
+
             writeEmployeeData(employeeList);
+
+            lblOutput.setText("Updated Employee (ID: " + currentEmployee.getId() + ")");
+            lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
         });
 
         btnDeleteEmployee.setOnAction(e -> {
             System.out.println("Delete Employee");
+
+            int employeeId = currentEmployee.getId();
 
             employeeList.remove(currentEmployee);
             writeEmployeeData(employeeList);
@@ -216,6 +277,16 @@ public class HelloApplication extends Application {
                 empDepartment.setText(currentEmployee.getDepartment());
                 empSalary.setText(String.valueOf(currentEmployee.getSalary()));
                 empPosition.setText(currentEmployee.getPosition());
+
+                payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
+                payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
+                payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
+                payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
+                payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
+                payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
+                payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
+
+                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
             }
             else {
                 empName.setText("");
@@ -224,7 +295,13 @@ public class HelloApplication extends Application {
                 empDepartment.setText("");
                 empSalary.setText("");
                 empPosition.setText("");
+
+                payRegularRate.setText("");
+
+                lblPayrollOutput.setText("");
             }
+
+            lblOutput.setText("Deleted Employee (ID: " + employeeId + ")");
         });
 
         btnNextEmployee.setOnAction(e -> {
@@ -240,7 +317,23 @@ public class HelloApplication extends Application {
                 empSalary.setText(String.valueOf(currentEmployee.getSalary()));
                 empPosition.setText(currentEmployee.getPosition());
 
+                lblPayNameValue.setText(currentEmployee.getName());
+                payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
+                payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
+                payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
+                payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
+                payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
+                payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
+                payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
+
                 currentEmployeeIndex++;
+
+                lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+            }
+            else {
+                lblOutput.setText("Already Showing Last Employee!");
+                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
             }
         });
 
@@ -257,7 +350,23 @@ public class HelloApplication extends Application {
                 empSalary.setText(String.valueOf(currentEmployee.getSalary()));
                 empPosition.setText(currentEmployee.getPosition());
 
+                lblPayNameValue.setText(currentEmployee.getName());
+                payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
+                payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
+                payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
+                payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
+                payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
+                payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
+                payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
+
                 currentEmployeeIndex--;
+
+                lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+            }
+            else {
+                lblOutput.setText("Already Showing First Employee!");
+                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
             }
         });
 
@@ -271,6 +380,7 @@ public class HelloApplication extends Application {
         TitledPane payrollPane = new TitledPane("Payroll Details", payrollBox);
         payrollBox.setPadding(new Insets(10,10,10,10));
 
+        /*
         // row for Payroll Results
         HBox rowPayrollResults = new HBox(10);
         rowPayrollResults.setStyle("-fx-background-color: #87CEEB;");
@@ -287,28 +397,180 @@ public class HelloApplication extends Application {
         VBox.setVgrow(txtPayrollResults, Priority.ALWAYS);
         txtPayrollResults.setMaxHeight(Double.MAX_VALUE);
 
-        rowPayrollResults.getChildren().add(txtPayrollResults);
+        // txtPayrollResults.setText("Test Text" + "\n");
+        // txtPayrollResults.appendText("More Text");
 
+        rowPayrollResults.getChildren().add(txtPayrollResults);
+         */
+
+        HBox rowPayName = new HBox(10);
+        rowPayName.setStyle("-fx-background-color: lightgray;");
+        rowPayName.setPadding(new Insets(10,10,10,10));
+        rowPayName.setHgrow(lblPayNameValue, Priority.ALWAYS);
+        lblPayNameValue.setMaxWidth(300);
+        if (currentEmployee != null) {
+            lblPayNameValue.setText(currentEmployee.getName());
+        }
+        rowPayName.getChildren().addAll(lblPayName, lblPayNameValue);
+
+        HBox rowRegularRate = new HBox(10);
+        rowRegularRate.setStyle("-fx-background-color: lightblue;");
+        rowRegularRate.setPadding(new Insets(10,10,10,10));
+        rowRegularRate.setHgrow(payRegularRate, Priority.ALWAYS);
+        payRegularRate.setMaxWidth(300);
+        if (currentEmployee != null) {
+            payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
+        }
+        rowRegularRate.getChildren().addAll(lblRegularRate, payRegularRate);
+
+        HBox rowRegularHours = new HBox(10);
+        rowRegularHours.setStyle("-fx-background-color: #87CEEB;");
+        rowRegularHours.setPadding(new Insets(10,10,10,10));
+        rowRegularHours.setHgrow(payRegularHours, Priority.ALWAYS);
+        payRegularHours.setMaxWidth(300);
+        if (currentEmployee != null) {
+            payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
+        }
+        rowRegularHours.getChildren().addAll(lblRegularHours, payRegularHours);
+
+        HBox rowOvertimeRate = new HBox(10);
+        rowOvertimeRate.setStyle("-fx-background-color: lightblue;");
+        rowOvertimeRate.setPadding(new Insets(10,10,10,10));
+        rowOvertimeRate.setHgrow(payOvertimeRate, Priority.ALWAYS);
+        payOvertimeRate.setMaxWidth(300);
+        if (currentEmployee != null) {
+            payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
+        }
+        rowOvertimeRate.getChildren().addAll(lblOvertimeRate, payOvertimeRate);
+
+        HBox rowOvertimeHours = new HBox(10);
+        rowOvertimeHours.setStyle("-fx-background-color: #87CEEB;");
+        rowOvertimeHours.setPadding(new Insets(10,10,10,10));
+        rowOvertimeHours.setHgrow(payOvertimeHours, Priority.ALWAYS);
+        payOvertimeHours.setMaxWidth(300);
+        if (currentEmployee != null) {
+            payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
+        }
+        rowOvertimeHours.getChildren().addAll(lblOvertimeHours, payOvertimeHours);
+
+        HBox rowBonus = new HBox(10);
+        rowBonus.setStyle("-fx-background-color: lightblue;");
+        rowBonus.setPadding(new Insets(10,10,10,10));
+        rowBonus.setHgrow(payBonus, Priority.ALWAYS);
+        payBonus.setMaxWidth(300);
+        if (currentEmployee != null) {
+            payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
+        }
+        rowBonus.getChildren().addAll(lblBonus, payBonus);
+
+        HBox rowTaxPercentage = new HBox(10);
+        rowTaxPercentage.setStyle("-fx-background-color: #87CEEB;");
+        rowTaxPercentage.setPadding(new Insets(10,10,10,10));
+        rowTaxPercentage.setHgrow(payTaxPercentage, Priority.ALWAYS);
+        payTaxPercentage.setMaxWidth(300);
+        if (currentEmployee != null) {
+            payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
+        }
+        rowTaxPercentage.getChildren().addAll(lblTaxPercentage, payTaxPercentage);
+
+        HBox rowDeductions = new HBox(10);
+        rowDeductions.setStyle("-fx-background-color: lightblue;");
+        rowDeductions.setPadding(new Insets(10,10,10,10));
+        rowDeductions.setHgrow(payDeductions, Priority.ALWAYS);
+        payDeductions.setMaxWidth(300);
+        if (currentEmployee != null) {
+            payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
+        }
+        rowDeductions.getChildren().addAll(lblDeductions, payDeductions);
+
+        HBox rowPayrollOutput = new HBox(10);
+        rowPayrollOutput.setStyle("-fx-background-color: #87CEEB;");
+        rowPayrollOutput.setPadding(new Insets(10,10,10,10));
+        rowPayrollOutput.setHgrow(lblPayrollOutput, Priority.ALWAYS);
+        rowPayrollOutput.setAlignment(Pos.CENTER);
+        rowPayrollOutput.getChildren().addAll(lblPayrollOutput);
 
         HBox rowPayrollButtons = new HBox(10);
         rowPayrollButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowPayrollButtons.setPadding(new Insets(10,10,10,10));
         rowPayrollButtons.setAlignment(Pos.CENTER);
-        rowPayrollButtons.getChildren().addAll(btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions);
+        rowPayrollButtons.getChildren().addAll(btnSavePayroll, btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions);
 
         // Add HBoxes to each payrollBox
-        payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
+        payrollBox.getChildren().addAll(rowPayName, rowRegularRate, rowRegularHours, rowOvertimeRate, rowOvertimeHours, rowBonus, rowTaxPercentage, rowDeductions, rowPayrollButtons, rowPayrollOutput);
+        // payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
+
+        btnSavePayroll.setOnAction(e -> {
+            System.out.println("Update Employee");
+
+            currentEmployee.setName(empName.getText());
+            currentEmployee.setEmail(empEmail.getText());
+            currentEmployee.setPhone(empPhone.getText());
+            currentEmployee.setDepartment(empDepartment.getText());
+            currentEmployee.setSalary(Double.parseDouble(empSalary.getText()));
+            currentEmployee.setPosition(empPosition.getText());
+
+            currentEmployee.payroll.setRegularRate(Double.parseDouble(payRegularRate.getText()));
+            currentEmployee.payroll.setRegularHours(Double.parseDouble(payRegularHours.getText()));
+            currentEmployee.payroll.setOvertimeRate(Double.parseDouble(payOvertimeRate.getText()));
+            currentEmployee.payroll.setOvertimeHours(Double.parseDouble(payOvertimeHours.getText()));
+            currentEmployee.payroll.setBonus(Double.parseDouble(payBonus.getText()));
+            currentEmployee.payroll.setTaxPercentage(Double.parseDouble(payTaxPercentage.getText()));
+            currentEmployee.payroll.setDeductions(Double.parseDouble(payDeductions.getText()));
+
+            lblPayNameValue.setText(currentEmployee.getName());
+
+            writeEmployeeData(employeeList);
+
+            lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+            lblPayrollOutput.setText("Saved Payroll for Employee (ID: " + currentEmployee.getId() + ")");
+        });
 
         btnCalculateSalaries.setOnAction(e -> {
-            System.out.println("Calculate Salaries");
+            double regularHours = Double.parseDouble(payRegularHours.getText());
+            double regularRate = Double.parseDouble(payRegularRate.getText());
+            double overtimeHours = Double.parseDouble(payOvertimeHours.getText());
+            double overtimeRate = Double.parseDouble(payOvertimeRate.getText());
+            double bonus = Double.parseDouble(payBonus.getText());
+
+            double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
+
+            lblPayrollOutput.setText("Gross Salary: " + String.format("%.2f", income));
+            System.out.println("Calculated Gross Salary: " + String.format("%.2f", income));
         });
 
         btnCalculateTaxes.setOnAction(e -> {
-            System.out.println("Calculate Taxes ");
+            double regularHours = Double.parseDouble(payRegularHours.getText());
+            double regularRate = Double.parseDouble(payRegularRate.getText());
+            double overtimeHours = Double.parseDouble(payOvertimeHours.getText());
+            double overtimeRate = Double.parseDouble(payOvertimeRate.getText());
+            double bonus = Double.parseDouble(payBonus.getText());
+            double taxPercentage = Double.parseDouble(payTaxPercentage.getText()) / 100;
+
+            double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
+            double taxes = income * taxPercentage;
+
+            lblPayrollOutput.setText("Taxes: " + String.format("%.2f", taxes));
+            System.out.println("Calculated Taxes: " + String.format("%.2f", taxes));
         });
 
         btnCalculateDeductions.setOnAction(e -> {
-            System.out.println("Calculate Deductions");
+            lblPayrollOutput.setText("Calculate Deductions");
+
+            double regularHours = Double.parseDouble(payRegularHours.getText());
+            double regularRate = Double.parseDouble(payRegularRate.getText());
+            double overtimeHours = Double.parseDouble(payOvertimeHours.getText());
+            double overtimeRate = Double.parseDouble(payOvertimeRate.getText());
+            double bonus = Double.parseDouble(payBonus.getText());
+            double taxPercentage = Double.parseDouble(payTaxPercentage.getText()) / 100;
+            double deductions = Double.parseDouble(payDeductions.getText());
+
+            double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
+            double taxes = income * taxPercentage;
+            double totalDeductions = taxes + deductions;
+
+            lblPayrollOutput.setText("Total Deductions: " + String.format("%.2f", totalDeductions));
+            System.out.println("Calculated Deductions:" + String.format("%.2f", totalDeductions));
         });
 
 
@@ -379,14 +641,9 @@ public class HelloApplication extends Application {
             FileReader reader = new FileReader("employees.json");
 
             employeeList = gson.fromJson(reader, employeeListType);
-
             reader.close();
 
-            for (Employee e : employeeList) {
-                System.out.println(e);
-            }
-
-            System.out.println(employeeList.size() + " Employees read from employees.json");
+            System.out.println(employeeList.size() + " Employee records read from employees.json");
         }
         catch (Exception e) {
             System.out.println("Error Reading Employee Data");
@@ -407,11 +664,56 @@ public class HelloApplication extends Application {
             gson.toJson(employeeList, writer);
 
             writer.close();
-            System.out.println("Employees saved to employees.json");
+            System.out.println(employeeList.size() + " Employee records saved to employees.json");
         }
         catch (Exception e) {
             System.out.println("Error Writing Employee Data");
             e.printStackTrace();
         }
     }
+
+    /*
+    public ArrayList<Payroll> readPayrollData() {
+        System.out.println("Reading Payroll Data...");
+
+        ArrayList<Payroll> payrollList = new ArrayList<>();
+
+        try {
+            Gson gson = new Gson();
+
+            Type payrollListType = new TypeToken<ArrayList<Payroll>>(){}.getType();
+            FileReader reader = new FileReader("payroll.json");
+
+            payrollList = gson.fromJson(reader, payrollListType);
+            reader.close();
+
+            System.out.println(payrollList.size() + " Pay records read from payroll.json");
+        }
+        catch (Exception e) {
+            System.out.println("Error Reading Payroll Data");
+            e.printStackTrace();
+            payrollList = new ArrayList<>();
+        }
+
+        return payrollList;
+    }
+
+    public void writePayrollData(ArrayList<Payroll> payrollList) {
+        System.out.println("Writing Payroll Data...");
+
+        try {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            FileWriter writer = new FileWriter("payroll.json");
+            gson.toJson(payrollList, writer);
+
+            writer.close();
+            System.out.println(payrollList.size() + " Pay records saved to payroll.json");
+        }
+        catch (Exception e) {
+            System.out.println("Error Writing Payroll Data");
+            e.printStackTrace();
+        }
+    }
+     */
 }
