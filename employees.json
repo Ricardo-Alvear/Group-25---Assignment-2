@@ -1,41 +1,22 @@
 [
   {
     "id": 1,
-    "name": "Test One",
-    "email": "test1@test.com",
-    "phone": "001",
-    "department": "Testing",
-    "position": "Tester",
+    "name": "Ricardo Alvear",
+    "email": "ricardo.alvear.test@gmail.com",
+    "phone": "123-456-7890",
+    "department": "Payroll",
+    "salary": 7850.0,
+    "position": "Manager",
     "payroll": {
-      "payrollId": 1,
-      "employeeId": 1,
-      "regularRate": 10.25,
-      "regularHours": 40.0,
-      "overtimeRate": 20.5,
-      "overtimeHours": 5.0,
-      "bonus": 100.0,
-      "taxPercentage": 10.0,
-      "deductions": 100.0,
-      "totalSalary": 0.0
-    }
-  },
-  {
-    "id": 2,
-    "name": "Test Two",
-    "email": "test2@test.com",
-    "phone": "002",
-    "department": "Testing",
-    "position": "Tester",
-    "payroll": {
-      "payrollId": 2,
-      "employeeId": 2,
-      "regularRate": 20.25,
-      "regularHours": 40.0,
-      "overtimeRate": 8.0,
-      "overtimeHours": 40.5,
-      "bonus": 200.0,
-      "taxPercentage": 15.0,
-      "deductions": 50.0,
+      "payrollId": 0,
+      "employeeId": 0,
+      "regularRate": 45.0,
+      "regularHours": 50.0,
+      "overtimeRate": 60.0,
+      "overtimeHours": 60.0,
+      "bonus": 2000.0,
+      "taxPercentage": 1.13,
+      "deductions": 500.0,
       "totalSalary": 0.0
     }
   }

@@ -18,6 +18,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 //import java.util.Objects;
@@ -37,6 +39,7 @@ public class HelloApplication extends Application {
     private final Label lblPosition = new Label("Position:");
     private final TextField empPosition = new TextField();
     private final Label lblOutput = new Label("");
+    private TextArea txtReportOutput;
 
     private final Button btnCreateEmployee = new Button("Create Employee");
     private final Button btnUpdateEmployee = new Button("Update Employee");
@@ -85,7 +88,21 @@ public class HelloApplication extends Application {
     private Payroll currentPayroll;
     private int currentPayrollIndex;
 
-    private void loadEmployeeDataIntoFields() {       // <<< UPDATED (new)
+    private final TextArea txtCompanyReport = new TextArea();
+    private final Button btnGenerateCompanyReport = new Button("Generate Company Report");
+
+    private Payroll createEmptyPayroll() {
+        // Create a new Payroll object with default values (zeros) for all fields
+        return new Payroll(0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    }
+
+    // Loads employee & payroll data into the UI fields
+    private void loadEmployeeDataIntoFields() {
+        if (currentEmployee.payroll == null) {
+            currentEmployee.payroll = createEmptyPayroll();
+        }
+
+        // Employee fields
         empName.setText(currentEmployee.getName());
         empEmail.setText(currentEmployee.getEmail());
         empPhone.setText(currentEmployee.getPhone());
@@ -93,7 +110,12 @@ public class HelloApplication extends Application {
         empSalary.setText(String.valueOf(currentEmployee.getSalary()));
         empPosition.setText(currentEmployee.getPosition());
 
-        lblPayNameValue.setText(currentEmployee.getName());
+        // Payroll fields
+        if (currentEmployee.payroll == null) {
+            currentEmployee.payroll = new Payroll(
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ); // Ensure payroll object exists
+        }
+
         payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
         payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
         payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
@@ -101,7 +123,42 @@ public class HelloApplication extends Application {
         payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
         payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
         payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
+
+        lblPayNameValue.setText(currentEmployee.getName());
     }
+
+    private double parseDoubleOrZero(TextField field) {
+        try {
+            return Double.parseDouble(field.getText());
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
+    private void navigateToEmployee(int newIndex) {
+        if (employeeList == null || employeeList.isEmpty()) return;
+
+        if (newIndex >= 0 && newIndex < employeeList.size()) {
+            currentEmployeeIndex = newIndex;
+            currentEmployee = employeeList.get(currentEmployeeIndex);
+
+            loadEmployeeDataIntoFields();
+
+            lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+            lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+        } else if (newIndex < 0) {
+            lblOutput.setText("Already Showing First Employee!");
+            lblPayrollOutput.setText(currentEmployee != null ?
+                    "Showing Employee (ID: " + currentEmployee.getId() + ")" : "");
+        } else {
+            lblOutput.setText("Already Showing Last Employee!");
+            lblPayrollOutput.setText(currentEmployee != null ?
+                    "Showing Employee (ID: " + currentEmployee.getId() + ")" : "");
+        }
+    }
+
+
+
 
     @Override
     public void start(Stage stage)  {
@@ -225,153 +282,111 @@ public class HelloApplication extends Application {
         btnCreateEmployee.setOnAction(e -> {
             System.out.println("Create Employee");
 
-            int highestId = -1;
+            // Determine the next ID
+            int highestId = employeeList.stream()
+                    .mapToInt(Employee::getId)
+                    .max()
+                    .orElse(0);
 
-            for (Employee employee : employeeList) {
-                if (employee.getId() > highestId) {
-                    highestId = employee.getId();
-                }
-            }
+            Employee newEmployee = new Employee(
+                    highestId + 1,
+                    empName.getText(),
+                    empEmail.getText(),
+                    empPhone.getText(),
+                    empDepartment.getText(),
+                    Double.parseDouble(empSalary.getText()),
+                    empPosition.getText()
+            );
 
-            if (highestId == -1) {
-                highestId = 0;
-            }
-
-            Employee newEmployee = new Employee(highestId + 1, empName.getText(), empEmail.getText(), empPhone.getText(), empDepartment.getText(), Double.parseDouble(empSalary.getText()), empPosition.getText());
             employeeList.add(newEmployee);
-
-            currentEmployee = employeeList.getLast();
-            currentEmployeeIndex = employeeList.indexOf(currentEmployee);
-
             writeEmployeeData(employeeList);
+
+            // Navigate to the newly created employee
+            navigateToEmployee(employeeList.size() - 1);
 
             lblOutput.setText("Created Employee (ID: " + currentEmployee.getId() + ")");
             lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
         });
 
         btnUpdateEmployee.setOnAction(e -> {
+            if (currentEmployee == null) return;
+
             System.out.println("Update Employee");
 
+            // Update employee fields
             currentEmployee.setName(empName.getText());
             currentEmployee.setEmail(empEmail.getText());
             currentEmployee.setPhone(empPhone.getText());
             currentEmployee.setDepartment(empDepartment.getText());
             currentEmployee.setPosition(empPosition.getText());
 
-            currentEmployee.payroll.setRegularRate(Double.parseDouble(payRegularRate.getText()));
-            currentEmployee.payroll.setRegularHours(Double.parseDouble(payRegularHours.getText()));
-            currentEmployee.payroll.setOvertimeRate(Double.parseDouble(payOvertimeRate.getText()));
-            currentEmployee.payroll.setOvertimeHours(Double.parseDouble(payOvertimeHours.getText()));
-            currentEmployee.payroll.setBonus(Double.parseDouble(payBonus.getText()));
-            currentEmployee.payroll.setTaxPercentage(Double.parseDouble(payTaxPercentage.getText()));
-            currentEmployee.payroll.setDeductions(Double.parseDouble(payDeductions.getText()));
-
-            lblPayNameValue.setText(currentEmployee.getName());
+            // Update payroll fields safely
+            if (currentEmployee.payroll == null) currentEmployee.payroll = new Payroll(  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+            currentEmployee.payroll.setRegularRate(parseDoubleOrZero(payRegularRate));
+            currentEmployee.payroll.setRegularHours(parseDoubleOrZero(payRegularHours));
+            currentEmployee.payroll.setOvertimeRate(parseDoubleOrZero(payOvertimeRate));
+            currentEmployee.payroll.setOvertimeHours(parseDoubleOrZero(payOvertimeHours));
+            currentEmployee.payroll.setBonus(parseDoubleOrZero(payBonus));
+            currentEmployee.payroll.setTaxPercentage(parseDoubleOrZero(payTaxPercentage));
+            currentEmployee.payroll.setDeductions(parseDoubleOrZero(payDeductions));
 
             writeEmployeeData(employeeList);
 
             lblOutput.setText("Updated Employee (ID: " + currentEmployee.getId() + ")");
             lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
+
+            loadEmployeeDataIntoFields(); // Refresh fields
         });
+
 
         btnDeleteEmployee.setOnAction(e -> {
             System.out.println("Delete Employee");
 
-            int employeeId = currentEmployee.getId();
+            if (currentEmployee == null) return;
 
+            int deletedId = currentEmployee.getId();
             employeeList.remove(currentEmployee);
             writeEmployeeData(employeeList);
 
-            currentEmployee = null;
-            currentEmployeeIndex = -1;
+            // If there are still employees, navigate to the previous index or first employee
+            if (!employeeList.isEmpty()) {
+                int newIndex = Math.min(currentEmployeeIndex, employeeList.size() - 1);
+                navigateToEmployee(newIndex);
+            } else {
+                // Clear fields if no employees remain
+                currentEmployee = null;
+                currentEmployeeIndex = -1;
 
-            if (employeeList != null && !employeeList.isEmpty()) {
-                currentEmployee = employeeList.getFirst();
-                currentEmployeeIndex = employeeList.indexOf(currentEmployee);
+                empName.clear();
+                empEmail.clear();
+                empPhone.clear();
+                empDepartment.clear();
+                empSalary.clear();
+                empPosition.clear();
 
-                empName.setText(currentEmployee.getName());
-                empEmail.setText(currentEmployee.getEmail());
-                empPhone.setText(currentEmployee.getPhone());
-                empDepartment.setText(currentEmployee.getDepartment());
-                empSalary.setText(String.valueOf(currentEmployee.getSalary()));
-                empPosition.setText(currentEmployee.getPosition());
+                payRegularRate.clear();
+                payRegularHours.clear();
+                payOvertimeRate.clear();
+                payOvertimeHours.clear();
+                payBonus.clear();
+                payTaxPercentage.clear();
+                payDeductions.clear();
 
-                payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
-                payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
-                payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
-                payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
-                payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
-                payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
-                payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
-
-                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-            }
-            else {
-                empName.setText("");
-                empEmail.setText("");
-                empPhone.setText("");
-                empDepartment.setText("");
-                empSalary.setText("");
-                empPosition.setText("");
-
-                payRegularRate.setText("");
-
+                lblOutput.setText("No Employees Available");
                 lblPayrollOutput.setText("");
             }
 
-            lblOutput.setText("Deleted Employee (ID: " + employeeId + ")");
+            lblOutput.setText("Deleted Employee (ID: " + deletedId + ")");
         });
 
         btnNextEmployee.setOnAction(e -> {
             System.out.println("Next Employee");
-
-            // Check if we are NOT already at the last employee
-            if (currentEmployeeIndex + 1 < employeeList.size()) {
-
-                // Move the index forward by 1
-                currentEmployeeIndex++;
-
-                // Update the current employee reference
-                currentEmployee = employeeList.get(currentEmployeeIndex);
-
-                // Load all employee & payroll values into the UI fields
-                loadEmployeeDataIntoFields();
-
-                // Update status messages on both screens
-                lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-
-            } else {
-                // If already at the last employee, cannot go forward
-                lblOutput.setText("Already Showing Last Employee!");
-                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-            }
+            navigateToEmployee(currentEmployeeIndex + 1);
         });
 
         btnPrevEmployee.setOnAction(e -> {
             System.out.println("Previous Employee");
-
-            // Check if we are NOT already at the first employee
-            if (currentEmployeeIndex - 1 >= 0) {
-
-                // Move the index backward by 1
-                currentEmployeeIndex--;
-
-                // Update the current employee reference
-                currentEmployee = employeeList.get(currentEmployeeIndex);
-
-                // Load all employee & payroll values into the UI fields
-                loadEmployeeDataIntoFields();
-
-                // Update status messages on both screens
-                lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-
-            } else {
-                // If already at index 0, cannot go back further
-                lblOutput.setText("Already Showing First Employee!");
-                lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-            }
+            navigateToEmployee(currentEmployeeIndex - 1);
         });
 
 
@@ -507,23 +522,26 @@ public class HelloApplication extends Application {
         // payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
 
         btnSavePayroll.setOnAction(e -> {
-            System.out.println("Update Employee");
+            if (currentEmployee == null) return;
 
-            currentEmployee.setName(empName.getText());
-            currentEmployee.setEmail(empEmail.getText());
-            currentEmployee.setPhone(empPhone.getText());
-            currentEmployee.setDepartment(empDepartment.getText());
-            currentEmployee.setPosition(empPosition.getText());
+            System.out.println("Save Payroll");
 
-            currentEmployee.payroll.setRegularRate(Double.parseDouble(payRegularRate.getText()));
-            currentEmployee.payroll.setRegularHours(Double.parseDouble(payRegularHours.getText()));
-            currentEmployee.payroll.setOvertimeRate(Double.parseDouble(payOvertimeRate.getText()));
-            currentEmployee.payroll.setOvertimeHours(Double.parseDouble(payOvertimeHours.getText()));
-            currentEmployee.payroll.setBonus(Double.parseDouble(payBonus.getText()));
-            currentEmployee.payroll.setTaxPercentage(Double.parseDouble(payTaxPercentage.getText()));
-            currentEmployee.payroll.setDeductions(Double.parseDouble(payDeductions.getText()));
-
-            empSalary.setText(String.valueOf(currentEmployee.getSalary()));
+            // Update payroll fields safely
+            if (currentEmployee.payroll == null) currentEmployee.payroll = new Payroll(  0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0 );
+            currentEmployee.payroll.setRegularRate(parseDoubleOrZero(payRegularRate));
+            currentEmployee.payroll.setRegularHours(parseDoubleOrZero(payRegularHours));
+            currentEmployee.payroll.setOvertimeRate(parseDoubleOrZero(payOvertimeRate));
+            currentEmployee.payroll.setOvertimeHours(parseDoubleOrZero(payOvertimeHours));
+            currentEmployee.payroll.setBonus(parseDoubleOrZero(payBonus));
+            currentEmployee.payroll.setTaxPercentage(parseDoubleOrZero(payTaxPercentage));
+            currentEmployee.payroll.setDeductions(parseDoubleOrZero(payDeductions));
+            // Update salary in employee field based on payroll calculation
+            double grossSalary = (currentEmployee.payroll.getRegularHours() * currentEmployee.payroll.getRegularRate())
+                    + (currentEmployee.payroll.getOvertimeHours() * currentEmployee.payroll.getOvertimeRate())
+                    + currentEmployee.payroll.getBonus();
+            currentEmployee.setSalary(grossSalary);
+            empSalary.setText(String.format("%.2f", grossSalary));
 
             lblPayNameValue.setText(currentEmployee.getName());
 
@@ -531,6 +549,8 @@ public class HelloApplication extends Application {
 
             lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
             lblPayrollOutput.setText("Saved Payroll for Employee (ID: " + currentEmployee.getId() + ")");
+
+            loadEmployeeDataIntoFields(); // Refresh fields
         });
 
         btnCalculateSalaries.setOnAction(e -> {
@@ -612,6 +632,115 @@ public class HelloApplication extends Application {
 
         // Add HBoxes to each reportingBox
         reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons);
+
+        VBox companyReportBox = new VBox(10);
+        TitledPane companyReportPane = new TitledPane("Company Summary Report", companyReportBox);
+        companyReportBox.setPadding(new Insets(10,10,10,10));
+
+// TextArea to show report
+        txtCompanyReport.setEditable(false);
+        txtCompanyReport.setWrapText(true);
+        txtCompanyReport.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(txtCompanyReport, Priority.ALWAYS);
+
+// Button to generate report
+        HBox reportButtonRow = new HBox(10);
+        reportButtonRow.setAlignment(Pos.CENTER);
+        reportButtonRow.setPadding(new Insets(10,10,10,10));
+        reportButtonRow.getChildren().add(btnGenerateCompanyReport);
+
+// Add components to VBox
+        companyReportBox.getChildren().addAll(txtCompanyReport, reportButtonRow);
+
+// Add new pane to Accordion
+        accordion.getPanes().add(companyReportPane);
+
+        btnGenerateCompanyReport.setOnAction(e -> {
+            if (employeeList == null || employeeList.isEmpty()) {
+                lblOutput.setText("No employees to report.");
+                return;
+            }
+
+            int totalEmployees = employeeList.size();
+
+            // Unique departments
+            Set<String> departments = new HashSet<>();
+            for (Employee emp : employeeList) {
+                departments.add(emp.getDepartment());
+            }
+            int totalDepartments = departments.size();
+
+            // Total payroll cost
+            double totalPayrollCost = 0;
+            for (Employee emp : employeeList) {
+                totalPayrollCost += emp.getSalary();
+            }
+
+            // Average salary
+            double averageSalary = totalEmployees > 0 ? totalPayrollCost / totalEmployees : 0;
+
+            // Build report string
+            StringBuilder report = new StringBuilder();
+            report.append("========== COMPANY REPORT ==========\n\n");
+            report.append("Total Employees: ").append(totalEmployees).append("\n");
+            report.append("Total Departments: ").append(totalDepartments).append("\n");
+            report.append(String.format("Total Payroll Cost: $%.2f\n", totalPayrollCost));
+            report.append(String.format("Average Salary: $%.2f\n", averageSalary));
+            report.append("\n------------------------------------\n");
+
+            // Department breakdown
+            report.append("Departments:\n");
+            for (String dept : departments) {
+                report.append("- ").append(dept).append("\n");
+            }
+
+            report.append("------------------------------------\n");
+
+            // Employee breakdown
+            report.append("Employees:\n");
+            for (Employee emp : employeeList) {
+                report.append(emp.getName())
+                        .append(" | ")
+                        .append(emp.getDepartment())
+                        .append(" | $")
+                        .append(String.format("%.2f", emp.getSalary()))
+                        .append("\n");
+            }
+
+            txtReportOutput.setText(report.toString());
+        });
+
+        Button btnExportReport = new Button("Extract Report");
+
+        btnExportReport.setOnAction(e -> {
+            try (FileWriter fw = new FileWriter("company_report.txt")) {
+                fw.write(txtReportOutput.getText());
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("Report Exported");
+                alert.setContentText("company_report.txt has been saved successfully.");
+                alert.show();
+
+            } catch (Exception ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText("Export Failed");
+                alert.setContentText("Could not save the report.");
+                alert.show();
+            }
+        });
+        txtReportOutput = new TextArea();
+        txtReportOutput.setPrefHeight(300);   // height of the report area
+        txtReportOutput.setEditable(false);
+        txtReportOutput.setWrapText(true);     // optional, wraps text nicely
+
+// Add it to your layout, e.g., a VBox
+        VBox mainLayout = new VBox(10);
+        mainLayout.getChildren().addAll(
+                btnGenerateCompanyReport,
+                btnExportReport,
+                txtReportOutput
+        );
+
 
         btnCalculateEmpReport.setOnAction(e -> {
             System.out.println("Calculate Employee Report");
@@ -721,6 +850,8 @@ public class HelloApplication extends Application {
             System.out.println("Error Writing Payroll Data");
             e.printStackTrace();
         }
+
     }
      */
+
 }

@@ -7,7 +7,7 @@ public class Employee {
     protected String email;
     protected String phone;
     protected String department;
-
+    private double salary;
     protected String position;
 
     protected Payroll payroll;
@@ -20,7 +20,7 @@ public class Employee {
         this.department = department;
         this.position = position;
 
-        this.payroll = new Payroll(id, id, 0, 0, 0, 0, 0, 0, 0, 0);
+        this.payroll = null;
     }
 
     public int getId() {
@@ -71,7 +71,19 @@ public class Employee {
         this.position = position;
     }
 
-    public double getSalary(){
-        return payroll.calculateTotalSalary();
+
+
+    public double getSalary() {
+        if (payroll != null) {
+            return (payroll.getRegularRate() * payroll.getRegularHours())
+                    + (payroll.getOvertimeRate() * payroll.getOvertimeHours())
+                    + payroll.getBonus();
+        }
+        return salary; // fallback
     }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
 }
