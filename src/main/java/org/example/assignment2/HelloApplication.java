@@ -85,6 +85,24 @@ public class HelloApplication extends Application {
     private Payroll currentPayroll;
     private int currentPayrollIndex;
 
+    private void loadEmployeeDataIntoFields() {       // <<< UPDATED (new)
+        empName.setText(currentEmployee.getName());
+        empEmail.setText(currentEmployee.getEmail());
+        empPhone.setText(currentEmployee.getPhone());
+        empDepartment.setText(currentEmployee.getDepartment());
+        empSalary.setText(String.valueOf(currentEmployee.getSalary()));
+        empPosition.setText(currentEmployee.getPosition());
+
+        lblPayNameValue.setText(currentEmployee.getName());
+        payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
+        payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
+        payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
+        payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
+        payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
+        payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
+        payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
+    }
+
     @Override
     public void start(Stage stage)  {
 //        FXMLLoader fxmlLoader1 = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
@@ -130,7 +148,7 @@ public class HelloApplication extends Application {
         HBox rowName = new HBox(10);
         rowName.setStyle("-fx-background-color: lightblue;");
         rowName.setPadding(new Insets(10,10,10,10));
-        rowName.setHgrow(empName, Priority.ALWAYS);
+        HBox.setHgrow(empName, Priority.ALWAYS);
         empName.setMaxWidth(300);
         if (currentEmployee != null) {
             empName.setText(currentEmployee.getName());
@@ -140,7 +158,7 @@ public class HelloApplication extends Application {
         HBox rowEmail = new HBox(10);
         rowEmail.setStyle("-fx-background-color: #87CEEB;");
         rowEmail.setPadding(new Insets(10,10,10,10));
-        rowEmail.setHgrow(empEmail, Priority.ALWAYS);
+        HBox.setHgrow(empEmail, Priority.ALWAYS);
         empEmail.setMaxWidth(300);
         if (currentEmployee != null) {
             empEmail.setText(currentEmployee.getEmail());
@@ -150,7 +168,7 @@ public class HelloApplication extends Application {
         HBox rowPhone = new HBox(10);
         rowPhone.setStyle("-fx-background-color: lightblue;");
         rowPhone.setPadding(new Insets(10,10,10,10));
-        rowPhone.setHgrow(empPhone, Priority.ALWAYS);
+        HBox.setHgrow(empPhone, Priority.ALWAYS);
         empPhone.setMaxWidth(300);
         if (currentEmployee != null) {
             empPhone.setText(currentEmployee.getPhone());
@@ -161,7 +179,7 @@ public class HelloApplication extends Application {
         HBox rowDepartment = new HBox(10);
         rowDepartment.setStyle("-fx-background-color: #87CEEB;");
         rowDepartment.setPadding(new Insets(10,10,10,10));
-        rowDepartment.setHgrow(empDepartment, Priority.ALWAYS);
+        HBox.setHgrow(empDepartment, Priority.ALWAYS);
         empDepartment.setMaxWidth(300);
         if (currentEmployee != null) {
             empDepartment.setText(currentEmployee.getDepartment());
@@ -171,8 +189,9 @@ public class HelloApplication extends Application {
         HBox rowSalary = new HBox(10);
         rowSalary.setStyle("-fx-background-color: lightblue;");
         rowSalary.setPadding(new Insets(10,10,10,10));
-        rowSalary.setHgrow(empSalary, Priority.ALWAYS);
+        HBox.setHgrow(empSalary, Priority.ALWAYS);
         empSalary.setMaxWidth(300);
+        empSalary.setEditable(false);
         if (currentEmployee != null) {
             empSalary.setText(String.valueOf(currentEmployee.getSalary()));
         }
@@ -181,7 +200,7 @@ public class HelloApplication extends Application {
         HBox rowPosition = new HBox(10);
         rowPosition.setStyle("-fx-background-color: #87CEEB;");
         rowPosition.setPadding(new Insets(10,10,10,10));
-        rowPosition.setHgrow(empPosition, Priority.ALWAYS);
+        HBox.setHgrow(empPosition, Priority.ALWAYS);
         empPosition.setMaxWidth(300);
         if (currentEmployee != null) {
             empPosition.setText(currentEmployee.getPosition());
@@ -237,7 +256,6 @@ public class HelloApplication extends Application {
             currentEmployee.setEmail(empEmail.getText());
             currentEmployee.setPhone(empPhone.getText());
             currentEmployee.setDepartment(empDepartment.getText());
-            currentEmployee.setSalary(Double.parseDouble(empSalary.getText()));
             currentEmployee.setPosition(empPosition.getText());
 
             currentEmployee.payroll.setRegularRate(Double.parseDouble(payRegularRate.getText()));
@@ -307,31 +325,24 @@ public class HelloApplication extends Application {
         btnNextEmployee.setOnAction(e -> {
             System.out.println("Next Employee");
 
+            // Check if we are NOT already at the last employee
             if (currentEmployeeIndex + 1 < employeeList.size()) {
-                currentEmployee = employeeList.get(currentEmployeeIndex + 1);
 
-                empName.setText(currentEmployee.getName());
-                empEmail.setText(currentEmployee.getEmail());
-                empPhone.setText(currentEmployee.getPhone());
-                empDepartment.setText(currentEmployee.getDepartment());
-                empSalary.setText(String.valueOf(currentEmployee.getSalary()));
-                empPosition.setText(currentEmployee.getPosition());
-
-                lblPayNameValue.setText(currentEmployee.getName());
-                payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
-                payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
-                payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
-                payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
-                payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
-                payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
-                payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
-
+                // Move the index forward by 1
                 currentEmployeeIndex++;
 
+                // Update the current employee reference
+                currentEmployee = employeeList.get(currentEmployeeIndex);
+
+                // Load all employee & payroll values into the UI fields
+                loadEmployeeDataIntoFields();
+
+                // Update status messages on both screens
                 lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
                 lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-            }
-            else {
+
+            } else {
+                // If already at the last employee, cannot go forward
                 lblOutput.setText("Already Showing Last Employee!");
                 lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
             }
@@ -340,31 +351,24 @@ public class HelloApplication extends Application {
         btnPrevEmployee.setOnAction(e -> {
             System.out.println("Previous Employee");
 
+            // Check if we are NOT already at the first employee
             if (currentEmployeeIndex - 1 >= 0) {
-                currentEmployee = employeeList.get(currentEmployeeIndex - 1);
 
-                empName.setText(currentEmployee.getName());
-                empEmail.setText(currentEmployee.getEmail());
-                empPhone.setText(currentEmployee.getPhone());
-                empDepartment.setText(currentEmployee.getDepartment());
-                empSalary.setText(String.valueOf(currentEmployee.getSalary()));
-                empPosition.setText(currentEmployee.getPosition());
-
-                lblPayNameValue.setText(currentEmployee.getName());
-                payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
-                payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
-                payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
-                payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
-                payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
-                payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
-                payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
-
+                // Move the index backward by 1
                 currentEmployeeIndex--;
 
+                // Update the current employee reference
+                currentEmployee = employeeList.get(currentEmployeeIndex);
+
+                // Load all employee & payroll values into the UI fields
+                loadEmployeeDataIntoFields();
+
+                // Update status messages on both screens
                 lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
                 lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
-            }
-            else {
+
+            } else {
+                // If already at index 0, cannot go back further
                 lblOutput.setText("Already Showing First Employee!");
                 lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
             }
@@ -494,7 +498,9 @@ public class HelloApplication extends Application {
         rowPayrollButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowPayrollButtons.setPadding(new Insets(10,10,10,10));
         rowPayrollButtons.setAlignment(Pos.CENTER);
-        rowPayrollButtons.getChildren().addAll(btnSavePayroll, btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions);
+        rowPayrollButtons.getChildren().addAll(btnPrevEmployee, btnSavePayroll, btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions, btnNextEmployee);
+
+
 
         // Add HBoxes to each payrollBox
         payrollBox.getChildren().addAll(rowPayName, rowRegularRate, rowRegularHours, rowOvertimeRate, rowOvertimeHours, rowBonus, rowTaxPercentage, rowDeductions, rowPayrollButtons, rowPayrollOutput);
@@ -507,7 +513,6 @@ public class HelloApplication extends Application {
             currentEmployee.setEmail(empEmail.getText());
             currentEmployee.setPhone(empPhone.getText());
             currentEmployee.setDepartment(empDepartment.getText());
-            currentEmployee.setSalary(Double.parseDouble(empSalary.getText()));
             currentEmployee.setPosition(empPosition.getText());
 
             currentEmployee.payroll.setRegularRate(Double.parseDouble(payRegularRate.getText()));
@@ -517,6 +522,8 @@ public class HelloApplication extends Application {
             currentEmployee.payroll.setBonus(Double.parseDouble(payBonus.getText()));
             currentEmployee.payroll.setTaxPercentage(Double.parseDouble(payTaxPercentage.getText()));
             currentEmployee.payroll.setDeductions(Double.parseDouble(payDeductions.getText()));
+
+            empSalary.setText(String.valueOf(currentEmployee.getSalary()));
 
             lblPayNameValue.setText(currentEmployee.getName());
 

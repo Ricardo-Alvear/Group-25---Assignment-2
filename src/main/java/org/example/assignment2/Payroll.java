@@ -107,4 +107,14 @@ public class Payroll {
         this.totalSalary = totalSalary;
     }
 
+    public double calculateTotalSalary(){
+        double gross = (regularRate * regularHours) +
+                       (overtimeRate * overtimeHours) +
+                       bonus;
+
+        double taxAmount = gross * (taxPercentage / 100);
+        return gross = taxAmount - deductions;
+    }
+
+
 }

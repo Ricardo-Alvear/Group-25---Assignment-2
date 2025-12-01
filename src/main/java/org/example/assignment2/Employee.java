@@ -7,7 +7,7 @@ public class Employee {
     protected String email;
     protected String phone;
     protected String department;
-    private double salary;
+
     protected String position;
 
     protected Payroll payroll;
@@ -18,7 +18,6 @@ public class Employee {
         this.email = email;
         this.phone = phone;
         this.department = department;
-        this.salary = salary;
         this.position = position;
 
         this.payroll = new Payroll(id, id, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -64,14 +63,6 @@ public class Employee {
         this.department = department;
     }
 
-    public double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(double salary) {
-        this.salary = salary;
-    }
-
     public String getPosition() {
         return position;
     }
@@ -80,9 +71,7 @@ public class Employee {
         this.position = position;
     }
 
-
-
-
-
-
+    public double getSalary(){
+        return payroll.calculateTotalSalary();
+    }
 }
