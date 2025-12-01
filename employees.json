@@ -1,29 +1,42 @@
 [
   {
-    "id": 4,
-    "name": "Test Four",
-    "email": "test04@test.com",
-    "phone": "004",
+    "id": 1,
+    "name": "Test One",
+    "email": "test1@test.com",
+    "phone": "001",
     "department": "Testing",
-    "salary": 4000.0,
-    "position": "Tester"
+    "position": "Tester",
+    "payroll": {
+      "payrollId": 1,
+      "employeeId": 1,
+      "regularRate": 10.25,
+      "regularHours": 40.0,
+      "overtimeRate": 20.5,
+      "overtimeHours": 5.0,
+      "bonus": 100.0,
+      "taxPercentage": 10.0,
+      "deductions": 100.0,
+      "totalSalary": 0.0
+    }
   },
   {
-    "id": 5,
-    "name": "Test Five",
-    "email": "test05@test.com",
-    "phone": "005",
+    "id": 2,
+    "name": "Test Two",
+    "email": "test2@test.com",
+    "phone": "002",
     "department": "Testing",
-    "salary": 5000.0,
-    "position": "Tester"
-  },
-  {
-    "id": 6,
-    "name": "Test Six",
-    "email": "test06@test.com",
-    "phone": "006",
-    "department": "Testing",
-    "salary": 6000.0,
-    "position": "Tester"
+    "position": "Tester",
+    "payroll": {
+      "payrollId": 2,
+      "employeeId": 2,
+      "regularRate": 20.25,
+      "regularHours": 40.0,
+      "overtimeRate": 8.0,
+      "overtimeHours": 40.5,
+      "bonus": 200.0,
+      "taxPercentage": 15.0,
+      "deductions": 50.0,
+      "totalSalary": 0.0
+    }
   }
 ]

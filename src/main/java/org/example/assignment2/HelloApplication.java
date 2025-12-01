@@ -191,7 +191,7 @@ public class HelloApplication extends Application {
         rowSalary.setPadding(new Insets(10,10,10,10));
         HBox.setHgrow(empSalary, Priority.ALWAYS);
         empSalary.setMaxWidth(300);
-        empSalary.setEditable(false);
+        // empSalary.setEditable(false);
         if (currentEmployee != null) {
             empSalary.setText(String.valueOf(currentEmployee.getSalary()));
         }
