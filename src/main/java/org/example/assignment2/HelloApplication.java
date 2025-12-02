@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Application;
-//import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,7 +21,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-//import java.util.Objects;
 
 public class HelloApplication extends Application {
 
@@ -65,7 +63,7 @@ public class HelloApplication extends Application {
     private final TextField payDeductions = new TextField();
     private final Label lblPayrollOutput = new Label("");
 
-    private final TextArea txtPayrollResults = new TextArea();
+//    private final TextArea txtPayrollResults = new TextArea();
 
     private final Button btnSavePayroll = new Button("Save Payroll");
     private final Button btnCalculateSalaries = new Button("Calculate Salary");
@@ -162,8 +160,6 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage)  {
-//        FXMLLoader fxmlLoader1 = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-
         // Load Employee Data
 
         employeeList = readEmployeeData();
@@ -196,12 +192,10 @@ public class HelloApplication extends Application {
 
         stage.setTitle("Fun Time's HR Management and Payroll Processing!");
 
-        // Main layout - VBox then use HBox for fields/buttons
         VBox rootBox = new VBox(10);
         TitledPane employeesPane = new TitledPane("Employees Details", rootBox);
         rootBox.setPadding(new Insets(10,10,10,10));
 
-        // row for emp first and last name
         HBox rowName = new HBox(10);
         rowName.setStyle("-fx-background-color: lightblue;");
         rowName.setPadding(new Insets(10,10,10,10));
@@ -389,18 +383,14 @@ public class HelloApplication extends Application {
             navigateToEmployee(currentEmployeeIndex - 1);
         });
 
-
-        // Add HBoxes to each rootBox
         rootBox.getChildren().addAll(rowName, rowEmail, rowPhone,  rowDepartment, rowSalary,  rowPosition,
                 rowButtons, rowOutput);
-
 
         VBox payrollBox = new VBox(10);
         TitledPane payrollPane = new TitledPane("Payroll Details", payrollBox);
         payrollBox.setPadding(new Insets(10,10,10,10));
 
         /*
-        // row for Payroll Results
         HBox rowPayrollResults = new HBox(10);
         rowPayrollResults.setStyle("-fx-background-color: #87CEEB;");
         rowPayrollResults.setPadding(new Insets(10,10,10,10));
@@ -515,9 +505,6 @@ public class HelloApplication extends Application {
         rowPayrollButtons.setAlignment(Pos.CENTER);
         rowPayrollButtons.getChildren().addAll(btnPrevEmployee, btnSavePayroll, btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions, btnNextEmployee);
 
-
-
-        // Add HBoxes to each payrollBox
         payrollBox.getChildren().addAll(rowPayName, rowRegularRate, rowRegularHours, rowOvertimeRate, rowOvertimeHours, rowBonus, rowTaxPercentage, rowDeductions, rowPayrollButtons, rowPayrollOutput);
         // payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
 
@@ -600,12 +587,10 @@ public class HelloApplication extends Application {
             System.out.println("Calculated Deductions:" + String.format("%.2f", totalDeductions));
         });
 
-
         VBox reportingBox = new VBox(10);
         TitledPane reportingPane = new TitledPane("Company Reports", reportingBox);
         reportingBox.setPadding(new Insets(10,10,10,10));
 
-        // row for Reporting Results
         HBox rowReportingResults = new HBox(10);
         rowReportingResults.setStyle("-fx-background-color: lightblue;");
         rowReportingResults.setPadding(new Insets(10,10,10,10));
@@ -618,11 +603,7 @@ public class HelloApplication extends Application {
 
         VBox.setVgrow(rowReportingResults, Priority.ALWAYS);
         rowReportingResults.setMaxHeight(Double.MAX_VALUE);
-
-
         rowReportingResults.getChildren().add(txtReportingResults);
-
-
 
         HBox rowReportingButtons = new HBox(10);
         rowReportingButtons.setStyle("-fx-background-color: #E5E4E2;");
@@ -630,7 +611,6 @@ public class HelloApplication extends Application {
         rowReportingButtons.setAlignment(Pos.CENTER);
         rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport);
 
-        // Add HBoxes to each reportingBox
         reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons);
 
         VBox companyReportBox = new VBox(10);
@@ -728,10 +708,12 @@ public class HelloApplication extends Application {
                 alert.show();
             }
         });
+
         txtReportOutput = new TextArea();
-        txtReportOutput.setPrefHeight(300);   // height of the report area
+        txtReportOutput.setPrefHeight(100);
         txtReportOutput.setEditable(false);
-        txtReportOutput.setWrapText(true);     // optional, wraps text nicely
+        txtReportOutput.setWrapText(false);
+//        txtReportOutput.setWrapText(true);
 
 // Add it to your layout, e.g., a VBox
         VBox mainLayout = new VBox(10);
@@ -741,26 +723,36 @@ public class HelloApplication extends Application {
                 txtReportOutput
         );
 
-
         btnCalculateEmpReport.setOnAction(e -> {
-            System.out.println("Calculate Employee Report");
+
+            if (employeeList == null || employeeList.isEmpty()) {
+                txtReportingResults.appendText("No employees to report.\n");
+            } else {
+                txtReportingResults.appendText("Calculate Employee Report\n");
+            }
+
         });
 
         btnCalculateDeptReport.setOnAction(e -> {
-            System.out.println("Calculate Department Report");
+
+            if (employeeList == null || employeeList.isEmpty()) {
+                txtReportingResults.appendText("No employees to report.\n");
+            } else {
+                txtReportingResults.appendText("Calculate Departments Report\n");
+            }
+
         });
 
         // Defaults to expanded Employee Pane when app is launched
 //        accordion.setExpandedPane(employeesPane);
 
-        // Add employeePane, payrollPane and reportingPane to Accordion
         accordion.getPanes().addAll(employeesPane, payrollPane, reportingPane);
 
-        Scene scene = new Scene(accordion,1000, 600);
+        Scene scene = new Scene(accordion,1000, 700);
 
 
         stage.setMinWidth(1000);
-        stage.setMinHeight(600);
+        stage.setMinHeight(700);
         stage.setScene(scene);
         stage.show();
     }
