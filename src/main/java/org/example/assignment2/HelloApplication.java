@@ -70,6 +70,8 @@ public class HelloApplication extends Application {
     private final Button btnCalculateSalaries = new Button("Calculate Salary");
     private final Button btnCalculateTaxes = new Button("Calculate Taxes");
     private final Button btnCalculateDeductions = new Button("Calculate Deductions");
+    private final Button btnPayrollNextEmployee = new Button("Next Employee");
+    private final Button btnPayrollPrevEmployee = new Button("Previous Employee");
 
     private final TextArea txtReportingResults = new TextArea();
 
@@ -147,12 +149,10 @@ public class HelloApplication extends Application {
             lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
         } else if (newIndex < 0) {
             lblOutput.setText("Already Showing First Employee!");
-            lblPayrollOutput.setText(currentEmployee != null ?
-                    "Showing Employee (ID: " + currentEmployee.getId() + ")" : "");
+            lblPayrollOutput.setText(currentEmployee != null ? "Already Showing First Employee!" : "");
         } else {
             lblOutput.setText("Already Showing Last Employee!");
-            lblPayrollOutput.setText(currentEmployee != null ?
-                    "Showing Employee (ID: " + currentEmployee.getId() + ")" : "");
+            lblPayrollOutput.setText(currentEmployee != null ? "Already Showing Last Employee!" : "");
         }
     }
 
@@ -547,10 +547,20 @@ public class HelloApplication extends Application {
         rowPayrollButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowPayrollButtons.setPadding(new Insets(10,10,10,10));
         rowPayrollButtons.setAlignment(Pos.CENTER);
-        rowPayrollButtons.getChildren().addAll(btnPrevEmployee, btnSavePayroll, btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions, btnNextEmployee);
+        rowPayrollButtons.getChildren().addAll(btnPayrollPrevEmployee, btnSavePayroll, btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions, btnPayrollNextEmployee);
 
         payrollBox.getChildren().addAll(rowPayName, rowRegularRate, rowRegularHours, rowOvertimeRate, rowOvertimeHours, rowBonus, rowTaxPercentage, rowDeductions, rowPayrollButtons, rowPayrollOutput);
         // payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
+
+        btnPayrollNextEmployee.setOnAction(e -> {
+            System.out.println("Next Employee");
+            navigateToEmployee(currentEmployeeIndex + 1);
+        });
+
+        btnPayrollPrevEmployee.setOnAction(e -> {
+            System.out.println("Previous Employee");
+            navigateToEmployee(currentEmployeeIndex - 1);
+        });
 
         btnSavePayroll.setOnAction(e -> {
             if (currentEmployee == null) return;
