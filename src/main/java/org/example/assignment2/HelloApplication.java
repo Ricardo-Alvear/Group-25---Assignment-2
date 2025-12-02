@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 
+
 public class HelloApplication extends Application {
 
     private final Label lblName = new Label("Name:");
@@ -156,7 +157,50 @@ public class HelloApplication extends Application {
     }
 
 
+    private String generateCompanyReportString() {
+        if (employeeList == null || employeeList.isEmpty()) {
+            return "No employees to report.";
+        }
 
+        int totalEmployees = employeeList.size();
+
+        Set<String> departments = new HashSet<>();
+        double totalPayrollCost = 0;
+
+        for (Employee emp : employeeList) {
+            departments.add(emp.getDepartment());
+            totalPayrollCost += emp.getSalary();
+        }
+
+        double averageSalary = totalEmployees > 0 ? totalPayrollCost / totalEmployees : 0;
+        int totalDepartments = departments.size();
+
+        StringBuilder report = new StringBuilder();
+        report.append("========== COMPANY REPORT ==========\n\n");
+        report.append("Total Employees: ").append(totalEmployees).append("\n");
+        report.append("Total Departments: ").append(totalDepartments).append("\n");
+        report.append(String.format("Total Payroll Cost: $%.2f\n", totalPayrollCost));
+        report.append(String.format("Average Salary: $%.2f\n", averageSalary));
+        report.append("\n------------------------------------\n");
+
+        report.append("Departments:\n");
+        for (String dept : departments) {
+            report.append("- ").append(dept).append("\n");
+        }
+
+        report.append("------------------------------------\n");
+        report.append("Employees:\n");
+        for (Employee emp : employeeList) {
+            report.append(emp.getName())
+                    .append(" | ")
+                    .append(emp.getDepartment())
+                    .append(" | $")
+                    .append(String.format("%.2f", emp.getSalary()))
+                    .append("\n");
+        }
+
+        return report.toString();
+    }
 
     @Override
     public void start(Stage stage)  {
@@ -636,58 +680,57 @@ public class HelloApplication extends Application {
         accordion.getPanes().add(companyReportPane);
 
         btnGenerateCompanyReport.setOnAction(e -> {
+            // Now you just call the function!
+            String reportText = generateCompanyReportString();
+            txtReportOutput.setText(reportText);
+        });
+
+        btnCalculateDeptReport.setOnAction(e -> {
+            // 1. Check if there is data
             if (employeeList == null || employeeList.isEmpty()) {
-                lblOutput.setText("No employees to report.");
+                txtReportingResults.setText("No employees available to report.");
                 return;
             }
 
-            int totalEmployees = employeeList.size();
+            StringBuilder sb = new StringBuilder();
+            sb.append("====== DEPARTMENT SUMMARY ======\n\n");
 
-            // Unique departments
-            Set<String> departments = new HashSet<>();
+            // 2. Find all unique departments first
+            Set<String> uniqueDepartments = new HashSet<>();
             for (Employee emp : employeeList) {
-                departments.add(emp.getDepartment());
-            }
-            int totalDepartments = departments.size();
-
-            // Total payroll cost
-            double totalPayrollCost = 0;
-            for (Employee emp : employeeList) {
-                totalPayrollCost += emp.getSalary();
+                // Handle potential null departments to avoid crashes
+                String dept = (emp.getDepartment() == null) ? "Unknown" : emp.getDepartment();
+                uniqueDepartments.add(dept);
             }
 
-            // Average salary
-            double averageSalary = totalEmployees > 0 ? totalPayrollCost / totalEmployees : 0;
+            // 3. Loop through each unique department to calculate totals
+            for (String dept : uniqueDepartments) {
+                double deptTotalSalary = 0;
+                int deptEmployeeCount = 0;
+                StringBuilder employeesInDept = new StringBuilder();
 
-            // Build report string
-            StringBuilder report = new StringBuilder();
-            report.append("========== COMPANY REPORT ==========\n\n");
-            report.append("Total Employees: ").append(totalEmployees).append("\n");
-            report.append("Total Departments: ").append(totalDepartments).append("\n");
-            report.append(String.format("Total Payroll Cost: $%.2f\n", totalPayrollCost));
-            report.append(String.format("Average Salary: $%.2f\n", averageSalary));
-            report.append("\n------------------------------------\n");
+                for (Employee emp : employeeList) {
+                    String currentEmpDept = (emp.getDepartment() == null) ? "Unknown" : emp.getDepartment();
 
-            // Department breakdown
-            report.append("Departments:\n");
-            for (String dept : departments) {
-                report.append("- ").append(dept).append("\n");
+                    // If this employee belongs to the current department loop
+                    if (currentEmpDept.equalsIgnoreCase(dept)) {
+                        deptTotalSalary += emp.getSalary();
+                        deptEmployeeCount++;
+                        // Add their name to a temp list
+                        employeesInDept.append(String.format("   - %s (ID: %d)\n", emp.getName(), emp.getId()));
+                    }
+                }
+
+                // 4. Build the report section for this department
+                sb.append("DEPARTMENT: ").append(dept.toUpperCase()).append("\n");
+                sb.append("Headcount: ").append(deptEmployeeCount).append("\n");
+                sb.append(String.format("Total Salary Budget: $%.2f\n", deptTotalSalary));
+                sb.append("Staff List:\n").append(employeesInDept);
+                sb.append("-----------------------------------\n");
             }
 
-            report.append("------------------------------------\n");
-
-            // Employee breakdown
-            report.append("Employees:\n");
-            for (Employee emp : employeeList) {
-                report.append(emp.getName())
-                        .append(" | ")
-                        .append(emp.getDepartment())
-                        .append(" | $")
-                        .append(String.format("%.2f", emp.getSalary()))
-                        .append("\n");
-            }
-
-            txtReportOutput.setText(report.toString());
+            // 5. Output to the TextArea
+            txtReportingResults.setText(sb.toString());
         });
 
         Button btnExportReport = new Button("Extract Report");
@@ -724,24 +767,41 @@ public class HelloApplication extends Application {
         );
 
         btnCalculateEmpReport.setOnAction(e -> {
-
             if (employeeList == null || employeeList.isEmpty()) {
-                txtReportingResults.appendText("No employees to report.\n");
-            } else {
-                txtReportingResults.appendText("Calculate Employee Report\n");
+                txtReportingResults.setText("No employees available.");
+                return;
             }
 
-        });
+            StringBuilder sb = new StringBuilder();
+            sb.append("====== INDIVIDUAL EMPLOYEE REPORT ======\n\n");
 
-        btnCalculateDeptReport.setOnAction(e -> {
+            for (Employee emp : employeeList) {
+                sb.append("ID: ").append(emp.getId()).append(" | Name: ").append(emp.getName()).append("\n");
+                sb.append("Position: ").append(emp.getPosition()).append("\n");
 
-            if (employeeList == null || employeeList.isEmpty()) {
-                txtReportingResults.appendText("No employees to report.\n");
-            } else {
-                txtReportingResults.appendText("Calculate Departments Report\n");
+                // Calculate Net Pay on the fly for the report
+                double gross = emp.getSalary(); // Assuming salary field holds the Gross Calculation
+                double tax = 0;
+                double deduct = 0;
+
+                // Check if payroll object exists to get accurate tax/deductions
+                if(emp.payroll != null) {
+                    tax = gross * (emp.payroll.getTaxPercentage() / 100);
+                    deduct = emp.payroll.getDeductions();
+                }
+
+                double netPay = gross - tax - deduct;
+
+                sb.append(String.format("Gross Pay:   $%.2f\n", gross));
+                sb.append(String.format("Taxes:       $%.2f\n", tax));
+                sb.append(String.format("Deductions:  $%.2f\n", deduct));
+                sb.append(String.format("NET PAY:     $%.2f\n", netPay));
+                sb.append("-----------------------------------\n");
             }
 
+            txtReportingResults.setText(sb.toString());
         });
+
 
         // Defaults to expanded Employee Pane when app is launched
 //        accordion.setExpandedPane(employeesPane);
