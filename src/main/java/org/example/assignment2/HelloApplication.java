@@ -38,7 +38,7 @@ public class HelloApplication extends Application {
     private final Label lblPosition = new Label("Position:");
     private final TextField empPosition = new TextField();
     private final Label lblOutput = new Label("");
-    private TextArea txtReportOutput;
+
 
     private final Button btnCreateEmployee = new Button("Create Employee");
     private final Button btnUpdateEmployee = new Button("Update Employee");
@@ -89,8 +89,7 @@ public class HelloApplication extends Application {
     private Payroll currentPayroll;
     private int currentPayrollIndex;
 
-    private final TextArea txtCompanyReport = new TextArea();
-    private final Button btnGenerateCompanyReport = new Button("Generate Company Report");
+
 
     private Payroll createEmptyPayroll() {
         // Create a new Payroll object with default values (zeros) for all fields
@@ -667,33 +666,6 @@ public class HelloApplication extends Application {
 
         reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons);
 
-        VBox companyReportBox = new VBox(10);
-        TitledPane companyReportPane = new TitledPane("Company Summary Report", companyReportBox);
-        companyReportBox.setPadding(new Insets(10,10,10,10));
-
-// TextArea to show report
-        txtCompanyReport.setEditable(false);
-        txtCompanyReport.setWrapText(true);
-        txtCompanyReport.setMaxWidth(Double.MAX_VALUE);
-        VBox.setVgrow(txtCompanyReport, Priority.ALWAYS);
-
-// Button to generate report
-        HBox reportButtonRow = new HBox(10);
-        reportButtonRow.setAlignment(Pos.CENTER);
-        reportButtonRow.setPadding(new Insets(10,10,10,10));
-        reportButtonRow.getChildren().add(btnGenerateCompanyReport);
-
-// Add components to VBox
-        companyReportBox.getChildren().addAll(txtCompanyReport, reportButtonRow);
-
-// Add new pane to Accordion
-        accordion.getPanes().add(companyReportPane);
-
-        btnGenerateCompanyReport.setOnAction(e -> {
-            // Now you just call the function!
-            String reportText = generateCompanyReportString();
-            txtReportOutput.setText(reportText);
-        });
 
         btnCalculateDeptReport.setOnAction(e -> {
             // 1. Check if there is data
@@ -743,38 +715,6 @@ public class HelloApplication extends Application {
             txtReportingResults.setText(sb.toString());
         });
 
-        Button btnExportReport = new Button("Extract Report");
-
-        btnExportReport.setOnAction(e -> {
-            try (FileWriter fw = new FileWriter("company_report.txt")) {
-                fw.write(txtReportOutput.getText());
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText("Report Exported");
-                alert.setContentText("company_report.txt has been saved successfully.");
-                alert.show();
-
-            } catch (Exception ex) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setHeaderText("Export Failed");
-                alert.setContentText("Could not save the report.");
-                alert.show();
-            }
-        });
-
-        txtReportOutput = new TextArea();
-        txtReportOutput.setPrefHeight(100);
-        txtReportOutput.setEditable(false);
-        txtReportOutput.setWrapText(false);
-//        txtReportOutput.setWrapText(true);
-
-// Add it to your layout, e.g., a VBox
-        VBox mainLayout = new VBox(10);
-        mainLayout.getChildren().addAll(
-                btnGenerateCompanyReport,
-                btnExportReport,
-                txtReportOutput
-        );
 
         btnCalculateEmpReport.setOnAction(e -> {
             if (employeeList == null || employeeList.isEmpty()) {
