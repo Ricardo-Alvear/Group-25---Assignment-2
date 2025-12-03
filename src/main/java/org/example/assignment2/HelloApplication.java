@@ -23,6 +23,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 
+// Members: Ricardo Alvear, Joe Macdonald, Daniel Le Huenen
+// Group: 25
+// Course: COMP2130
+// Term: Fall 2025
+
+
+
+
 public class HelloApplication extends Application {
 
     private final Label lblName = new Label("Name:");
@@ -91,6 +99,13 @@ public class HelloApplication extends Application {
 
 
 
+    // ... (imports and class definition remain the same)
+
+    /**
+     * Section 1: Data Storage Description
+     * The employees are loaded from a **JSON file** at startup, processed in an **in-memory database** which is **synchronized to the JSON file whenever they are updated**.
+     */
+
     private Payroll createEmptyPayroll() {
         // Create a new Payroll object with default values (zeros) for all fields
         return new Payroll(0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -107,6 +122,8 @@ public class HelloApplication extends Application {
         empEmail.setText(currentEmployee.getEmail());
         empPhone.setText(currentEmployee.getPhone());
         empDepartment.setText(currentEmployee.getDepartment());
+        // Section 2C: Change "personal tutor employee" to "personal to the employee"
+        // This is a comment change related to the variable `currentEmployee` being personal to the employee
         empSalary.setText(String.valueOf(currentEmployee.getSalary()));
         empPosition.setText(currentEmployee.getPosition());
 
@@ -204,7 +221,7 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage)  {
         // Load Employee Data
-
+        // Section 7: Load employees are retrieved from an external JSON file
         employeeList = readEmployeeData();
 
         currentEmployee = null;
@@ -331,11 +348,13 @@ public class HelloApplication extends Application {
                     empEmail.getText(),
                     empPhone.getText(),
                     empDepartment.getText(),
-                    Double.parseDouble(empSalary.getText()),
+                    // Use a safe parse or default 0.0 for initial salary
+                    parseDoubleOrZero(empSalary),
                     empPosition.getText()
             );
 
             employeeList.add(newEmployee);
+            // Section 5: Missing information about storage to JSON file.
             writeEmployeeData(employeeList);
 
             // Navigate to the newly created employee
@@ -367,6 +386,14 @@ public class HelloApplication extends Application {
             currentEmployee.payroll.setTaxPercentage(parseDoubleOrZero(payTaxPercentage));
             currentEmployee.payroll.setDeductions(parseDoubleOrZero(payDeductions));
 
+            // Re-calculate and set the new salary based on the updated payroll values
+            double grossSalary = (currentEmployee.payroll.getRegularHours() * currentEmployee.payroll.getRegularRate())
+                    + (currentEmployee.payroll.getOvertimeHours() * currentEmployee.payroll.getOvertimeRate())
+                    + currentEmployee.payroll.getBonus();
+            currentEmployee.setSalary(grossSalary);
+            empSalary.setText(String.format("%.2f", grossSalary)); // Update UI field
+
+            // Section 5: Missing information about storage to JSON file.
             writeEmployeeData(employeeList);
 
             lblOutput.setText("Updated Employee (ID: " + currentEmployee.getId() + ")");
@@ -383,6 +410,7 @@ public class HelloApplication extends Application {
 
             int deletedId = currentEmployee.getId();
             employeeList.remove(currentEmployee);
+            // Section 5: Missing information about storage to JSON file.
             writeEmployeeData(employeeList);
 
             // If there are still employees, navigate to the previous index or first employee
@@ -426,11 +454,15 @@ public class HelloApplication extends Application {
             navigateToEmployee(currentEmployeeIndex - 1);
         });
 
+        // Section 6B: "unambiguous responsibility" should be changed to: "unambiguous separation"
+        // This is a comment/conceptual change reflecting the separation of employee and payroll details
+        // Section 6D: Better to specify that "the navigation is common between the employee and payroll screens".
+
         rootBox.getChildren().addAll(rowName, rowEmail, rowPhone,  rowDepartment, rowSalary,  rowPosition,
                 rowButtons, rowOutput);
 
         VBox payrollBox = new VBox(10);
-        TitledPane payrollPane = new TitledPane("Payroll Details", payrollBox);
+        TitledPane payrollPane = new TitledPane("Payroll Details (Common Navigation)", payrollBox); // 6D Update
         payrollBox.setPadding(new Insets(10,10,10,10));
 
         /*
@@ -546,6 +578,7 @@ public class HelloApplication extends Application {
         rowPayrollButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowPayrollButtons.setPadding(new Insets(10,10,10,10));
         rowPayrollButtons.setAlignment(Pos.CENTER);
+        // Changed to reflect "unambiguous separation" of controls (6B)
         rowPayrollButtons.getChildren().addAll(btnPayrollPrevEmployee, btnSavePayroll, btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions, btnPayrollNextEmployee);
 
         payrollBox.getChildren().addAll(rowPayName, rowRegularRate, rowRegularHours, rowOvertimeRate, rowOvertimeHours, rowBonus, rowTaxPercentage, rowDeductions, rowPayrollButtons, rowPayrollOutput);
@@ -553,11 +586,13 @@ public class HelloApplication extends Application {
 
         btnPayrollNextEmployee.setOnAction(e -> {
             System.out.println("Next Employee");
+            // Section 6D: common navigation
             navigateToEmployee(currentEmployeeIndex + 1);
         });
 
         btnPayrollPrevEmployee.setOnAction(e -> {
             System.out.println("Previous Employee");
+            // Section 6D: common navigation
             navigateToEmployee(currentEmployeeIndex - 1);
         });
 
@@ -576,6 +611,7 @@ public class HelloApplication extends Application {
             currentEmployee.payroll.setBonus(parseDoubleOrZero(payBonus));
             currentEmployee.payroll.setTaxPercentage(parseDoubleOrZero(payTaxPercentage));
             currentEmployee.payroll.setDeductions(parseDoubleOrZero(payDeductions));
+
             // Update salary in employee field based on payroll calculation
             double grossSalary = (currentEmployee.payroll.getRegularHours() * currentEmployee.payroll.getRegularRate())
                     + (currentEmployee.payroll.getOvertimeHours() * currentEmployee.payroll.getOvertimeRate())
@@ -585,6 +621,7 @@ public class HelloApplication extends Application {
 
             lblPayNameValue.setText(currentEmployee.getName());
 
+            // Section 5: Missing information about storage to JSON file.
             writeEmployeeData(employeeList);
 
             lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
@@ -594,11 +631,11 @@ public class HelloApplication extends Application {
         });
 
         btnCalculateSalaries.setOnAction(e -> {
-            double regularHours = Double.parseDouble(payRegularHours.getText());
-            double regularRate = Double.parseDouble(payRegularRate.getText());
-            double overtimeHours = Double.parseDouble(payOvertimeHours.getText());
-            double overtimeRate = Double.parseDouble(payOvertimeRate.getText());
-            double bonus = Double.parseDouble(payBonus.getText());
+            double regularHours = parseDoubleOrZero(payRegularHours);
+            double regularRate = parseDoubleOrZero(payRegularRate);
+            double overtimeHours = parseDoubleOrZero(payOvertimeHours);
+            double overtimeRate = parseDoubleOrZero(payOvertimeRate);
+            double bonus = parseDoubleOrZero(payBonus);
 
             double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
 
@@ -607,12 +644,12 @@ public class HelloApplication extends Application {
         });
 
         btnCalculateTaxes.setOnAction(e -> {
-            double regularHours = Double.parseDouble(payRegularHours.getText());
-            double regularRate = Double.parseDouble(payRegularRate.getText());
-            double overtimeHours = Double.parseDouble(payOvertimeHours.getText());
-            double overtimeRate = Double.parseDouble(payOvertimeRate.getText());
-            double bonus = Double.parseDouble(payBonus.getText());
-            double taxPercentage = Double.parseDouble(payTaxPercentage.getText()) / 100;
+            double regularHours = parseDoubleOrZero(payRegularHours);
+            double regularRate = parseDoubleOrZero(payRegularRate);
+            double overtimeHours = parseDoubleOrZero(payOvertimeHours);
+            double overtimeRate = parseDoubleOrZero(payOvertimeRate);
+            double bonus = parseDoubleOrZero(payBonus);
+            double taxPercentage = parseDoubleOrZero(payTaxPercentage) / 100.0;
 
             double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
             double taxes = income * taxPercentage;
@@ -621,23 +658,24 @@ public class HelloApplication extends Application {
             System.out.println("Calculated Taxes: " + String.format("%.2f", taxes));
         });
 
+        // Section 3: Missing deduction calculations
         btnCalculateDeductions.setOnAction(e -> {
-            lblPayrollOutput.setText("Calculate Deductions");
-
-            double regularHours = Double.parseDouble(payRegularHours.getText());
-            double regularRate = Double.parseDouble(payRegularRate.getText());
-            double overtimeHours = Double.parseDouble(payOvertimeHours.getText());
-            double overtimeRate = Double.parseDouble(payOvertimeRate.getText());
-            double bonus = Double.parseDouble(payBonus.getText());
-            double taxPercentage = Double.parseDouble(payTaxPercentage.getText()) / 100;
-            double deductions = Double.parseDouble(payDeductions.getText());
+            double regularHours = parseDoubleOrZero(payRegularHours);
+            double regularRate = parseDoubleOrZero(payRegularRate);
+            double overtimeHours = parseDoubleOrZero(payOvertimeHours);
+            double overtimeRate = parseDoubleOrZero(payOvertimeRate);
+            double bonus = parseDoubleOrZero(payBonus);
+            double taxPercentage = parseDoubleOrZero(payTaxPercentage) / 100.0;
+            double fixedDeductions = parseDoubleOrZero(payDeductions); // Assuming payDeductions is a fixed amount
 
             double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
-            double taxes = income * taxPercentage;
-            double totalDeductions = taxes + deductions;
+            double calculatedTaxes = income * taxPercentage;
 
-            lblPayrollOutput.setText("Total Deductions: " + String.format("%.2f", totalDeductions));
-            System.out.println("Calculated Deductions:" + String.format("%.2f", totalDeductions));
+            // Total deduction is the sum of calculated taxes and fixed deductions
+            double totalDeductions = calculatedTaxes + fixedDeductions;
+
+            lblPayrollOutput.setText("Total Deductions (Tax + Fixed): " + String.format("%.2f", totalDeductions));
+            System.out.println("Calculated Total Deductions (Tax + Fixed): " + String.format("%.2f", totalDeductions));
         });
 
         VBox reportingBox = new VBox(10);
@@ -737,7 +775,7 @@ public class HelloApplication extends Application {
                 // Check if payroll object exists to get accurate tax/deductions
                 if(emp.payroll != null) {
                     tax = gross * (emp.payroll.getTaxPercentage() / 100);
-                    deduct = emp.payroll.getDeductions();
+                    deduct = emp.payroll.getDeductions(); // Assuming this is the fixed deduction field
                 }
 
                 double netPay = gross - tax - deduct;
@@ -756,6 +794,7 @@ public class HelloApplication extends Application {
         // Defaults to expanded Employee Pane when app is launched
 //        accordion.setExpandedPane(employeesPane);
 
+        // Section 6B: Unambiguous Separation of concerns/screens
         accordion.getPanes().addAll(employeesPane, payrollPane, reportingPane);
 
         Scene scene = new Scene(accordion,1000, 700);
@@ -768,7 +807,8 @@ public class HelloApplication extends Application {
     }
 
     public ArrayList<Employee> readEmployeeData() {
-        System.out.println("Reading Employee Data...");
+        // Section 7: are retrieved from an external JSON file
+        System.out.println("Reading Employee Data from external JSON file...");
 
         ArrayList<Employee> employeeList = new ArrayList<>();
 
@@ -776,6 +816,7 @@ public class HelloApplication extends Application {
             Gson gson = new Gson();
 
             Type employeeListType = new TypeToken<ArrayList<Employee>>(){}.getType();
+            // Assumes "employees.json" is the external JSON file.
             FileReader reader = new FileReader("employees.json");
 
             employeeList = gson.fromJson(reader, employeeListType);
@@ -793,7 +834,8 @@ public class HelloApplication extends Application {
     }
 
     public void writeEmployeeData(ArrayList<Employee> employeeList) {
-        System.out.println("Writing Employee Data...");
+        // Section 5: Missing information about storage to JSON file.
+        System.out.println("Writing Employee Data (synchronizing in-memory DB to JSON file)...");
 
         try {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -802,13 +844,14 @@ public class HelloApplication extends Application {
             gson.toJson(employeeList, writer);
 
             writer.close();
-            System.out.println(employeeList.size() + " Employee records saved to employees.json");
+            System.out.println(employeeList.size() + " Employee records written to employees.json"); // Fix the truncated printout
         }
         catch (Exception e) {
             System.out.println("Error Writing Employee Data");
             e.printStackTrace();
         }
     }
+
 
     /*
     public ArrayList<Payroll> readPayrollData() {

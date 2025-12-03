@@ -1,1 +1,65 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "Ricardo Alvear",
+    "email": "ricardo.alvear@gmail.com",
+    "phone": "647-998-5834",
+    "department": "HR",
+    "salary": 5892.0,
+    "position": "Manager",
+    "payroll": {
+      "payrollId": 0,
+      "employeeId": 0,
+      "regularRate": 34.0,
+      "regularHours": 50.0,
+      "overtimeRate": 64.0,
+      "overtimeHours": 12.0,
+      "bonus": 3424.0,
+      "taxPercentage": 1.13,
+      "deductions": 3000.0,
+      "totalSalary": 0.0
+    }
+  },
+  {
+    "id": 2,
+    "name": "Ricky Alvarez",
+    "email": "ricky.alvarez@gmail.com",
+    "phone": "416-295-6397",
+    "department": "Hiring",
+    "salary": 2765.0,
+    "position": "Staff",
+    "payroll": {
+      "payrollId": 0,
+      "employeeId": 0,
+      "regularRate": 30.0,
+      "regularHours": 53.0,
+      "overtimeRate": 45.0,
+      "overtimeHours": 15.0,
+      "bonus": 500.0,
+      "taxPercentage": 1.13,
+      "deductions": 300.0,
+      "totalSalary": 0.0
+    }
+  },
+  {
+    "id": 3,
+    "name": "Simpson Garfield",
+    "email": "simpson.garfield@gmail.com",
+    "phone": "647-534-8673",
+    "department": "Store",
+    "salary": 8088.35,
+    "position": "Manager",
+    "payroll": {
+      "payrollId": 0,
+      "employeeId": 0,
+      "regularRate": 50.0,
+      "regularHours": 38.0,
+      "overtimeRate": 65.0,
+      "overtimeHours": 13.0,
+      "bonus": 5343.35,
+      "taxPercentage": 1.13,
+      "deductions": 600.32,
+      "totalSalary": 0.0
+    }
+  }
+]
