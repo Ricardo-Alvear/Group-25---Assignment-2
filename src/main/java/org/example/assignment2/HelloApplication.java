@@ -102,7 +102,7 @@ public class HelloApplication extends Application {
     // ... (imports and class definition remain the same)
 
     /**
-     * Section 1: Data Storage Description
+     * Data Storage Description
      * The employees are loaded from a **JSON file** at startup, processed in an **in-memory database** which is **synchronized to the JSON file whenever they are updated**.
      */
 
@@ -122,8 +122,6 @@ public class HelloApplication extends Application {
         empEmail.setText(currentEmployee.getEmail());
         empPhone.setText(currentEmployee.getPhone());
         empDepartment.setText(currentEmployee.getDepartment());
-        // Section 2C: Change "personal tutor employee" to "personal to the employee"
-        // This is a comment change related to the variable `currentEmployee` being personal to the employee
         empSalary.setText(String.valueOf(currentEmployee.getSalary()));
         empPosition.setText(currentEmployee.getPosition());
 
@@ -221,7 +219,7 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage)  {
         // Load Employee Data
-        // Section 7: Load employees are retrieved from an external JSON file
+        // Load employees are retrieved from an external JSON file
         employeeList = readEmployeeData();
 
         currentEmployee = null;
@@ -354,7 +352,6 @@ public class HelloApplication extends Application {
             );
 
             employeeList.add(newEmployee);
-            // Section 5: Missing information about storage to JSON file.
             writeEmployeeData(employeeList);
 
             // Navigate to the newly created employee
@@ -393,7 +390,6 @@ public class HelloApplication extends Application {
             currentEmployee.setSalary(grossSalary);
             empSalary.setText(String.format("%.2f", grossSalary)); // Update UI field
 
-            // Section 5: Missing information about storage to JSON file.
             writeEmployeeData(employeeList);
 
             lblOutput.setText("Updated Employee (ID: " + currentEmployee.getId() + ")");
@@ -410,7 +406,6 @@ public class HelloApplication extends Application {
 
             int deletedId = currentEmployee.getId();
             employeeList.remove(currentEmployee);
-            // Section 5: Missing information about storage to JSON file.
             writeEmployeeData(employeeList);
 
             // If there are still employees, navigate to the previous index or first employee
@@ -454,38 +449,12 @@ public class HelloApplication extends Application {
             navigateToEmployee(currentEmployeeIndex - 1);
         });
 
-        // Section 6B: "unambiguous responsibility" should be changed to: "unambiguous separation"
-        // This is a comment/conceptual change reflecting the separation of employee and payroll details
-        // Section 6D: Better to specify that "the navigation is common between the employee and payroll screens".
-
         rootBox.getChildren().addAll(rowName, rowEmail, rowPhone,  rowDepartment, rowSalary,  rowPosition,
                 rowButtons, rowOutput);
 
         VBox payrollBox = new VBox(10);
         TitledPane payrollPane = new TitledPane("Payroll Details (Common Navigation)", payrollBox); // 6D Update
         payrollBox.setPadding(new Insets(10,10,10,10));
-
-        /*
-        HBox rowPayrollResults = new HBox(10);
-        rowPayrollResults.setStyle("-fx-background-color: #87CEEB;");
-        rowPayrollResults.setPadding(new Insets(10,10,10,10));
-        txtPayrollResults.setEditable(false);
-        txtPayrollResults.setWrapText(true);
-
-        VBox.setVgrow(rowPayrollResults, Priority.ALWAYS);
-        rowPayrollResults.setMaxHeight(Double.MAX_VALUE);
-
-        HBox.setHgrow(txtPayrollResults, Priority.ALWAYS);
-        txtPayrollResults.setMaxWidth(Double.MAX_VALUE);
-
-        VBox.setVgrow(txtPayrollResults, Priority.ALWAYS);
-        txtPayrollResults.setMaxHeight(Double.MAX_VALUE);
-
-        // txtPayrollResults.setText("Test Text" + "\n");
-        // txtPayrollResults.appendText("More Text");
-
-        rowPayrollResults.getChildren().add(txtPayrollResults);
-         */
 
         HBox rowPayName = new HBox(10);
         rowPayName.setStyle("-fx-background-color: lightgray;");
@@ -586,13 +555,11 @@ public class HelloApplication extends Application {
 
         btnPayrollNextEmployee.setOnAction(e -> {
             System.out.println("Next Employee");
-            // Section 6D: common navigation
             navigateToEmployee(currentEmployeeIndex + 1);
         });
 
         btnPayrollPrevEmployee.setOnAction(e -> {
             System.out.println("Previous Employee");
-            // Section 6D: common navigation
             navigateToEmployee(currentEmployeeIndex - 1);
         });
 
@@ -621,7 +588,6 @@ public class HelloApplication extends Application {
 
             lblPayNameValue.setText(currentEmployee.getName());
 
-            // Section 5: Missing information about storage to JSON file.
             writeEmployeeData(employeeList);
 
             lblOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
@@ -658,7 +624,6 @@ public class HelloApplication extends Application {
             System.out.println("Calculated Taxes: " + String.format("%.2f", taxes));
         });
 
-        // Section 3: Missing deduction calculations
         btnCalculateDeductions.setOnAction(e -> {
             double regularHours = parseDoubleOrZero(payRegularHours);
             double regularRate = parseDoubleOrZero(payRegularRate);
@@ -741,7 +706,7 @@ public class HelloApplication extends Application {
                     }
                 }
 
-                // 4. Build the report section for this department
+                // Build the report section for this department
                 sb.append("DEPARTMENT: ").append(dept.toUpperCase()).append("\n");
                 sb.append("Headcount: ").append(deptEmployeeCount).append("\n");
                 sb.append(String.format("Total Salary Budget: $%.2f\n", deptTotalSalary));
@@ -792,9 +757,9 @@ public class HelloApplication extends Application {
 
 
         // Defaults to expanded Employee Pane when app is launched
-//        accordion.setExpandedPane(employeesPane);
+        //        accordion.setExpandedPane(employeesPane);
 
-        // Section 6B: Unambiguous Separation of concerns/screens
+        // Separation of concerns/screens
         accordion.getPanes().addAll(employeesPane, payrollPane, reportingPane);
 
         Scene scene = new Scene(accordion,1000, 700);
@@ -807,7 +772,6 @@ public class HelloApplication extends Application {
     }
 
     public ArrayList<Employee> readEmployeeData() {
-        // Section 7: are retrieved from an external JSON file
         System.out.println("Reading Employee Data from external JSON file...");
 
         ArrayList<Employee> employeeList = new ArrayList<>();
@@ -834,7 +798,6 @@ public class HelloApplication extends Application {
     }
 
     public void writeEmployeeData(ArrayList<Employee> employeeList) {
-        // Section 5: Missing information about storage to JSON file.
         System.out.println("Writing Employee Data (synchronizing in-memory DB to JSON file)...");
 
         try {
@@ -851,52 +814,5 @@ public class HelloApplication extends Application {
             e.printStackTrace();
         }
     }
-
-
-    /*
-    public ArrayList<Payroll> readPayrollData() {
-        System.out.println("Reading Payroll Data...");
-
-        ArrayList<Payroll> payrollList = new ArrayList<>();
-
-        try {
-            Gson gson = new Gson();
-
-            Type payrollListType = new TypeToken<ArrayList<Payroll>>(){}.getType();
-            FileReader reader = new FileReader("payroll.json");
-
-            payrollList = gson.fromJson(reader, payrollListType);
-            reader.close();
-
-            System.out.println(payrollList.size() + " Pay records read from payroll.json");
-        }
-        catch (Exception e) {
-            System.out.println("Error Reading Payroll Data");
-            e.printStackTrace();
-            payrollList = new ArrayList<>();
-        }
-
-        return payrollList;
-    }
-
-    public void writePayrollData(ArrayList<Payroll> payrollList) {
-        System.out.println("Writing Payroll Data...");
-
-        try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-            FileWriter writer = new FileWriter("payroll.json");
-            gson.toJson(payrollList, writer);
-
-            writer.close();
-            System.out.println(payrollList.size() + " Pay records saved to payroll.json");
-        }
-        catch (Exception e) {
-            System.out.println("Error Writing Payroll Data");
-            e.printStackTrace();
-        }
-
-    }
-     */
 
 }
