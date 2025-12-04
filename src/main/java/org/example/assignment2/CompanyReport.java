@@ -28,6 +28,8 @@ public class CompanyReport {
     public CompanyReport(ArrayList<Employee> employeeList) {
         this.employeeList = employeeList;
         buildUI();
+        // Generate the report immediately on creation to populate initial data/summary
+        generateCompanyReport();
     }
 
     public VBox getUI() {
@@ -45,8 +47,8 @@ public class CompanyReport {
         // Summary stats
         lblTotalEmployees = new Label("Total Employees: 0");
         lblTotalDepartments = new Label("Total Departments: 0");
-        lblTotalPayrollCost = new Label("Total Payroll Cost: $0.00");
-        lblAverageSalary = new Label("Average Salary: $0.00");
+        lblTotalPayrollCost = new Label("Total Payroll Cost (Gross): $0.00");
+        lblAverageSalary = new Label("Average Gross Salary: $0.00");
 
         VBox summaryBox = new VBox(8,
                 lblTotalEmployees,
@@ -68,8 +70,8 @@ public class CompanyReport {
         scrollPane.setPrefHeight(300);
 
         // Buttons
-        btnGenerateReport = new Button("Generate Company Report");
-        btnExportReport = new Button("Export as Text File");
+        btnGenerateReport = new Button("Refresh Company Report");
+        btnExportReport = new Button("Export Report as Text File");
 
         HBox buttonBar = new HBox(10, btnGenerateReport, btnExportReport);
 
@@ -85,7 +87,16 @@ public class CompanyReport {
         btnExportReport.setOnAction(e -> exportReport());
     }
 
-    private void generateCompanyReport() {
+    public void generateCompanyReport() {
+
+        if (employeeList == null || employeeList.isEmpty()) {
+            txtReportOutput.setText("No employee data available to generate a report.");
+            lblTotalEmployees.setText("Total Employees: 0");
+            lblTotalDepartments.setText("Total Departments: 0");
+            lblTotalPayrollCost.setText("Total Payroll Cost (Gross): $0.00");
+            lblAverageSalary.setText("Average Gross Salary: $0.00");
+            return;
+        }
 
         // Total employees
         int totalEmployees = employeeList.size();
@@ -93,42 +104,43 @@ public class CompanyReport {
         // Total departments
         Set<String> departments = new HashSet<>();
         for (Employee emp : employeeList) {
-            departments.add(emp.getDepartment());
+            // Ensure department is handled gracefully
+            String dept = (emp.getDepartment() == null || emp.getDepartment().trim().isEmpty()) ? "Unknown" : emp.getDepartment();
+            departments.add(dept);
         }
         int totalDepartments = departments.size();
 
         // Total payroll cost and average salary
-        double totalPayrollCost = 0;
-        double totalSalary = 0;
+        double totalGrossSalary = 0;
         for (Employee emp : employeeList) {
-            totalPayrollCost += emp.getSalary();
-            totalSalary += emp.getSalary();
+            totalGrossSalary += emp.getSalary(); // Uses the calculated Gross Salary from Employee.getSalary()
         }
-        double averageSalary = totalEmployees > 0 ? totalSalary / totalEmployees : 0;
+        double averageSalary = totalEmployees > 0 ? totalGrossSalary / totalEmployees : 0;
 
+        // Update Summary Labels
         lblTotalEmployees.setText("Total Employees: " + totalEmployees);
         lblTotalDepartments.setText("Total Departments: " + totalDepartments);
-        lblTotalPayrollCost.setText(String.format("Total Payroll Cost: $%.2f", totalPayrollCost));
-        lblAverageSalary.setText(String.format("Average Salary: $%.2f", averageSalary));
+        lblTotalPayrollCost.setText(String.format("Total Payroll Cost (Gross): $%.2f", totalGrossSalary));
+        lblAverageSalary.setText(String.format("Average Gross Salary: $%.2f", averageSalary));
 
-        // Build text report
+        // Build detailed text report
         StringBuilder report = new StringBuilder();
         report.append("========== COMPANY REPORT ==========\n\n");
         report.append("Total Employees: ").append(totalEmployees).append("\n");
         report.append("Total Departments: ").append(totalDepartments).append("\n");
-        report.append(String.format("Total Payroll Cost: $%.2f\n", totalPayrollCost));
-        report.append(String.format("Average Salary: $%.2f\n", averageSalary));
+        report.append(String.format("Total Gross Payroll Cost: $%.2f\n", totalGrossSalary));
+        report.append(String.format("Average Gross Salary: $%.2f\n", averageSalary));
         report.append("\n------------------------------------\n");
         report.append("Department Breakdown:\n");
         for (String dept : departments) {
             report.append(" - ").append(dept).append("\n");
         }
         report.append("------------------------------------\n");
-        report.append("Employee Summary:\n");
+        report.append("Employee Summary (Gross Salary):\n");
         for (Employee emp : employeeList) {
             report.append("ID: ").append(emp.getId())
                     .append(" | Name: ").append(emp.getName())
-                    .append(" | Department: ").append(emp.getDepartment())
+                    .append(" | Dept: ").append(emp.getDepartment())
                     .append(" | Salary: $").append(String.format("%.2f", emp.getSalary()))
                     .append("\n");
         }
@@ -138,6 +150,14 @@ public class CompanyReport {
     }
 
     private void exportReport() {
+        if (txtReportOutput.getText().trim().isEmpty()) {
+            Alert noReportAlert = new Alert(Alert.AlertType.WARNING);
+            noReportAlert.setHeaderText("Export Warning");
+            noReportAlert.setContentText("Generate the report first before exporting.");
+            noReportAlert.show();
+            return;
+        }
+
         try {
             FileWriter fw = new FileWriter("company_report.txt");
             fw.write(txtReportOutput.getText());
@@ -145,13 +165,13 @@ public class CompanyReport {
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText("Report Exported");
-            alert.setContentText("company_report.txt has been saved successfully.");
+            alert.setContentText("company_report.txt has been saved successfully in the application directory.");
             alert.show();
 
         } catch (Exception ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText("Export Failed");
-            alert.setContentText("Could not save the report.");
+            alert.setContentText("Could not save the report: " + ex.getMessage());
             alert.show();
         }
     }

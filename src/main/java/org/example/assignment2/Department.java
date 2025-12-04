@@ -1,6 +1,5 @@
 package org.example.assignment2;
 
-
 public class Department {
     private int id;
     protected String name;
@@ -35,9 +34,4 @@ public class Department {
     public void setManager(String manager) {
         this.manager = manager;
     }
-
-
-
-
-
 }
