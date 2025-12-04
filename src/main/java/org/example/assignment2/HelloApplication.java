@@ -21,14 +21,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-
-
 // Members: Ricardo Alvear, Joe Macdonald, Daniel Le Huenen
 // Group: 25
 // Course: COMP2130
 // Term: Fall 2025
-
-
 
 
 public class HelloApplication extends Application {
@@ -332,8 +328,6 @@ public class HelloApplication extends Application {
 
 
         btnCreateEmployee.setOnAction(e -> {
-            System.out.println("Create Employee");
-
             // Determine the next ID
             int highestId = employeeList.stream()
                     .mapToInt(Employee::getId)
@@ -363,8 +357,6 @@ public class HelloApplication extends Application {
 
         btnUpdateEmployee.setOnAction(e -> {
             if (currentEmployee == null) return;
-
-            System.out.println("Update Employee");
 
             // Update employee fields
             currentEmployee.setName(empName.getText());
@@ -400,7 +392,6 @@ public class HelloApplication extends Application {
 
 
         btnDeleteEmployee.setOnAction(e -> {
-            System.out.println("Delete Employee");
 
             if (currentEmployee == null) return;
 
@@ -440,12 +431,10 @@ public class HelloApplication extends Application {
         });
 
         btnNextEmployee.setOnAction(e -> {
-            System.out.println("Next Employee");
             navigateToEmployee(currentEmployeeIndex + 1);
         });
 
         btnPrevEmployee.setOnAction(e -> {
-            System.out.println("Previous Employee");
             navigateToEmployee(currentEmployeeIndex - 1);
         });
 
@@ -554,19 +543,15 @@ public class HelloApplication extends Application {
         // payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
 
         btnPayrollNextEmployee.setOnAction(e -> {
-            System.out.println("Next Employee");
             navigateToEmployee(currentEmployeeIndex + 1);
         });
 
         btnPayrollPrevEmployee.setOnAction(e -> {
-            System.out.println("Previous Employee");
             navigateToEmployee(currentEmployeeIndex - 1);
         });
 
         btnSavePayroll.setOnAction(e -> {
             if (currentEmployee == null) return;
-
-            System.out.println("Save Payroll");
 
             // Update payroll fields safely
             if (currentEmployee.payroll == null) currentEmployee.payroll = new Payroll(  0, 0, 0, 0, 0, 0,
@@ -606,7 +591,6 @@ public class HelloApplication extends Application {
             double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
 
             lblPayrollOutput.setText("Gross Salary: " + String.format("%.2f", income));
-            System.out.println("Calculated Gross Salary: " + String.format("%.2f", income));
         });
 
         btnCalculateTaxes.setOnAction(e -> {
@@ -621,7 +605,6 @@ public class HelloApplication extends Application {
             double taxes = income * taxPercentage;
 
             lblPayrollOutput.setText("Taxes: " + String.format("%.2f", taxes));
-            System.out.println("Calculated Taxes: " + String.format("%.2f", taxes));
         });
 
         btnCalculateDeductions.setOnAction(e -> {
@@ -640,7 +623,6 @@ public class HelloApplication extends Application {
             double totalDeductions = calculatedTaxes + fixedDeductions;
 
             lblPayrollOutput.setText("Total Deductions (Tax + Fixed): " + String.format("%.2f", totalDeductions));
-            System.out.println("Calculated Total Deductions (Tax + Fixed): " + String.format("%.2f", totalDeductions));
         });
 
         VBox reportingBox = new VBox(10);
@@ -667,8 +649,35 @@ public class HelloApplication extends Application {
         rowReportingButtons.setAlignment(Pos.CENTER);
         rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport);
 
-        reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons);
+        HBox rowIndividualEmployee = new HBox(10);
+        rowIndividualEmployee.setStyle("-fx-background-color: #E5E4E2;");
+        rowIndividualEmployee.setPadding(new Insets(10,10,10,10));
+        rowIndividualEmployee.setAlignment(Pos.CENTER);
+        Label lblEmployeeID = new Label("Find Employee by ID");
+        TextField txtEmployeeID = new TextField();
+        Button btnEmployeeID = new Button("Generate Employee Report");
+        rowIndividualEmployee.getChildren().addAll(lblEmployeeID, txtEmployeeID, btnEmployeeID);
 
+        HBox rowIndividualDepartment = new HBox(10);
+        rowIndividualDepartment.setStyle("-fx-background-color: #E5E4E2;");
+        rowIndividualDepartment.setPadding(new Insets(10,10,10,10));
+        rowIndividualDepartment.setAlignment(Pos.CENTER);
+        Label lblDepartmentName = new Label("Find Department by Name");
+        TextField txtDepartmentName = new TextField();
+        Button btnDepartmentName = new Button("Generate Department Report");
+        rowIndividualDepartment.getChildren().addAll(lblDepartmentName,  txtDepartmentName, btnDepartmentName);
+
+
+        reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons,  rowIndividualEmployee, rowIndividualDepartment);
+
+        btnEmployeeID.setOnAction(e -> {
+            System.out.println("Employee ID: " + txtEmployeeID.getText());
+        });
+
+
+        btnDepartmentName.setOnAction(e -> {
+            System.out.println("Department Name: " + txtDepartmentName.getText());
+        });
 
         btnCalculateDeptReport.setOnAction(e -> {
             // 1. Check if there is data
@@ -772,7 +781,7 @@ public class HelloApplication extends Application {
     }
 
     public ArrayList<Employee> readEmployeeData() {
-        System.out.println("Reading Employee Data from external JSON file...");
+//        System.out.println("Reading Employee Data from external JSON file...");
 
         ArrayList<Employee> employeeList = new ArrayList<>();
 
@@ -786,10 +795,10 @@ public class HelloApplication extends Application {
             employeeList = gson.fromJson(reader, employeeListType);
             reader.close();
 
-            System.out.println(employeeList.size() + " Employee records read from employees.json");
+//            System.out.println(employeeList.size() + " Employee records read from employees.json");
         }
         catch (Exception e) {
-            System.out.println("Error Reading Employee Data");
+//            System.out.println("Error Reading Employee Data");
             e.printStackTrace();
             employeeList = new ArrayList<>();
         }
@@ -798,7 +807,7 @@ public class HelloApplication extends Application {
     }
 
     public void writeEmployeeData(ArrayList<Employee> employeeList) {
-        System.out.println("Writing Employee Data (synchronizing in-memory DB to JSON file)...");
+//        System.out.println("Writing Employee Data (synchronizing in-memory DB to JSON file)...");
 
         try {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -807,10 +816,10 @@ public class HelloApplication extends Application {
             gson.toJson(employeeList, writer);
 
             writer.close();
-            System.out.println(employeeList.size() + " Employee records written to employees.json"); // Fix the truncated printout
+//            System.out.println(employeeList.size() + " Employee records written to employees.json"); // Fix the truncated printout
         }
         catch (Exception e) {
-            System.out.println("Error Writing Employee Data");
+//            System.out.println("Error Writing Employee Data");
             e.printStackTrace();
         }
     }
