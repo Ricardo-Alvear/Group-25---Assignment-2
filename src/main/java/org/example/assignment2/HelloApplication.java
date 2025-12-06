@@ -19,7 +19,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 // Members: Ricardo Alvear, Joe Macdonald, Daniel Le Huenen
 // Group: 25
@@ -212,6 +211,87 @@ public class HelloApplication extends Application {
         return report.toString();
     }
 
+    private boolean validateInputs() {
+        boolean isValid = true;
+        StringBuilder validationMessage = new StringBuilder();
+
+        // Reset styles
+        empName.setStyle("");
+        empEmail.setStyle("");
+        // ... reset other field styles similarly ...
+
+        // --- Employee Details Validation ---
+
+        if (empName.getText().trim().isEmpty()) {
+            validationMessage.append("- Name is required.\n");
+            empName.setStyle("-fx-border-color: red;");
+            isValid = false;
+        }
+
+        if (empDepartment.getText().trim().isEmpty()) {
+            validationMessage.append("- Department is required.\n");
+            empDepartment.setStyle("-fx-border-color: red;");
+            isValid = false;
+        }
+
+        // --- Payroll Details (Numerical) Validation ---
+
+        // Fields that must be non-negative numbers
+        TextField[] numericFields = {
+                payRegularRate, payRegularHours, payOvertimeRate, payOvertimeHours,
+                payBonus, payTaxPercentage, payDeductions
+        };
+        String[] fieldNames = {
+                "Regular Rate", "Regular Hours", "Overtime Rate", "Overtime Hours",
+                "Bonus", "Tax Percentage", "Deductions"
+        };
+
+        for (int i = 0; i < numericFields.length; i++) {
+            if (!numericFields[i].getText().trim().isEmpty()) {
+                try {
+                    double value = Double.parseDouble(numericFields[i].getText());
+                    if (value < 0) {
+                        validationMessage.append(String.format("- %s must be non-negative.\n", fieldNames[i]));
+                        numericFields[i].setStyle("-fx-border-color: red;");
+                        isValid = false;
+                    }
+                } catch (NumberFormatException e) {
+                    validationMessage.append(String.format("- %s must be a valid number.\n", fieldNames[i]));
+                    numericFields[i].setStyle("-fx-border-color: red;");
+                    isValid = false;
+                }
+            }
+        }
+
+        // Update the output labels
+        if (isValid) {
+            lblOutput.setText("Employee Details: Valid");
+            lblPayrollOutput.setText("Payroll Details: Valid");
+        } else {
+            lblOutput.setText("Employee Details: Errors found. See Payroll Output.");
+            lblPayrollOutput.setText("Validation Errors:\n" + validationMessage.toString());
+        }
+
+        return isValid;
+    }
+
+    // In HelloApplication.java
+    private void handleExportAllData() {
+        if (employeeList == null || employeeList.isEmpty()) {
+            lblPayrollOutput.setText("Cannot export: No employee data available.");
+            return;
+        }
+
+        boolean success = writeEmployeeData(employeeList);
+
+        if (success) {
+            lblPayrollOutput.setText("Successfully synchronized all Employee and Payroll data to file.");
+
+        } else {
+            lblPayrollOutput.setText("Export Failed: Could not write data to file.");
+        }
+    }
+
     @Override
     public void start(Stage stage)  {
         // Load Employee Data
@@ -342,6 +422,9 @@ public class HelloApplication extends Application {
 
 
         btnCreateEmployee.setOnAction(e -> {
+
+            if (!validateInputs()) return;
+
             // Determine the next ID
             int highestId = employeeList.stream()
                     .mapToInt(Employee::getId)
@@ -371,6 +454,8 @@ public class HelloApplication extends Application {
 
         btnUpdateEmployee.setOnAction(e -> {
             if (currentEmployee == null) return;
+
+            if (!validateInputs()) return;
 
             // Update employee fields
             currentEmployee.setName(empName.getText());
@@ -716,10 +801,13 @@ public class HelloApplication extends Application {
         final Button btnSaveEmpReport = new Button("Save Employee Report");
         final Button btnSaveDeptReport = new Button("Save Department Report");
 
+
         rowReportingButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowReportingButtons.setPadding(new Insets(10,10,10,10));
         rowReportingButtons.setAlignment(Pos.CENTER);
-        rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport,  btnSaveEmpReport, btnSaveDeptReport);
+        final Button btnExportAllData = new Button("Export All Data (JSON)");
+        btnExportAllData.setOnAction(e -> handleExportAllData());
+        rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport,  btnSaveEmpReport, btnSaveDeptReport, btnExportAllData);
 
         HBox rowIndividualEmployee = new HBox(10);
         rowIndividualEmployee.setStyle("-fx-background-color: #E5E4E2;");
@@ -890,7 +978,7 @@ public class HelloApplication extends Application {
         return employeeList;
     }
 
-    public void writeEmployeeData(ArrayList<Employee> employeeList) {
+    public boolean writeEmployeeData(ArrayList<Employee> employeeList) {
 //        System.out.println("Writing Employee Data (synchronizing in-memory DB to JSON file)...");
 
         try {
@@ -906,6 +994,7 @@ public class HelloApplication extends Application {
 //            System.out.println("Error Writing Employee Data");
             e.printStackTrace();
         }
+        return false;
     }
 
 }

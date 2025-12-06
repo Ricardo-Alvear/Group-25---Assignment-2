@@ -61,5 +61,26 @@
       "deductions": 600.32,
       "totalSalary": 0.0
     }
+  },
+  {
+    "id": 4,
+    "name": "Ricardo Alvear",
+    "email": "32423443234",
+    "phone": "647-998-5834",
+    "department": "HR",
+    "salary": 0.0,
+    "position": "Manager",
+    "payroll": {
+      "payrollId": 0,
+      "employeeId": 0,
+      "regularRate": 0.0,
+      "regularHours": 0.0,
+      "overtimeRate": 0.0,
+      "overtimeHours": 0.0,
+      "bonus": 0.0,
+      "taxPercentage": 0.0,
+      "deductions": 0.0,
+      "totalSalary": 0.0
+    }
   }
 ]
