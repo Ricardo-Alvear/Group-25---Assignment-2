@@ -254,30 +254,36 @@ public class HelloApplication extends Application {
         rowName.setStyle("-fx-background-color: lightblue;");
         rowName.setPadding(new Insets(10,10,10,10));
         HBox.setHgrow(empName, Priority.ALWAYS);
-        empName.setMaxWidth(300);
+        empName.setMaxWidth(400);
         if (currentEmployee != null) {
             empName.setText(currentEmployee.getName());
         }
+        lblName.setPadding(new Insets(5,0,0,0));
+        rowName.setAlignment(Pos.CENTER);
         rowName.getChildren().addAll(lblName,empName);
 
         HBox rowEmail = new HBox(10);
         rowEmail.setStyle("-fx-background-color: #87CEEB;");
         rowEmail.setPadding(new Insets(10,10,10,10));
         HBox.setHgrow(empEmail, Priority.ALWAYS);
-        empEmail.setMaxWidth(300);
+        empEmail.setMaxWidth(400);
         if (currentEmployee != null) {
             empEmail.setText(currentEmployee.getEmail());
         }
+        lblEmail.setPadding(new Insets(5,0,0,0));
+        rowEmail.setAlignment(Pos.CENTER);
         rowEmail.getChildren().addAll(lblEmail,empEmail);
 
         HBox rowPhone = new HBox(10);
         rowPhone.setStyle("-fx-background-color: lightblue;");
         rowPhone.setPadding(new Insets(10,10,10,10));
         HBox.setHgrow(empPhone, Priority.ALWAYS);
-        empPhone.setMaxWidth(300);
         if (currentEmployee != null) {
             empPhone.setText(currentEmployee.getPhone());
         }
+        lblPhone.setPadding(new Insets(5,0,0,0));
+        empPhone.setMaxWidth(350);
+        rowPhone.setAlignment(Pos.CENTER);
         rowPhone.getChildren().addAll(lblPhone,empPhone);
 
 
@@ -285,31 +291,37 @@ public class HelloApplication extends Application {
         rowDepartment.setStyle("-fx-background-color: #87CEEB;");
         rowDepartment.setPadding(new Insets(10,10,10,10));
         HBox.setHgrow(empDepartment, Priority.ALWAYS);
-        empDepartment.setMaxWidth(300);
         if (currentEmployee != null) {
             empDepartment.setText(currentEmployee.getDepartment());
         }
+        lblDepartment.setPadding(new Insets(5,0,0,0));
+        empDepartment.setMaxWidth(370);
+        rowDepartment.setAlignment(Pos.CENTER);
         rowDepartment.getChildren().addAll(lblDepartment, empDepartment);
 
         HBox rowSalary = new HBox(10);
         rowSalary.setStyle("-fx-background-color: lightblue;");
         rowSalary.setPadding(new Insets(10,10,10,10));
         HBox.setHgrow(empSalary, Priority.ALWAYS);
-        empSalary.setMaxWidth(300);
+        empSalary.setMaxWidth(400);
         // empSalary.setEditable(false);
         if (currentEmployee != null) {
             empSalary.setText(String.valueOf(currentEmployee.getSalary()));
         }
+        lblSalary.setPadding(new Insets(5,0,0,0));
+        rowSalary.setAlignment(Pos.CENTER);
         rowSalary.getChildren().addAll(lblSalary,empSalary);
 
         HBox rowPosition = new HBox(10);
         rowPosition.setStyle("-fx-background-color: #87CEEB;");
         rowPosition.setPadding(new Insets(10,10,10,10));
         HBox.setHgrow(empPosition, Priority.ALWAYS);
-        empPosition.setMaxWidth(300);
         if (currentEmployee != null) {
             empPosition.setText(currentEmployee.getPosition());
         }
+        lblPosition.setPadding(new Insets(5,0,0,0));
+        empPosition.setMaxWidth(390);
+        rowPosition.setAlignment(Pos.CENTER);
         rowPosition.getChildren().addAll(lblPosition, empPosition);
 
         HBox rowOutput = new HBox(10);
@@ -325,6 +337,8 @@ public class HelloApplication extends Application {
         rowButtons.setAlignment(Pos.CENTER);
         rowButtons.getChildren().addAll(btnPrevEmployee, btnCreateEmployee, btnUpdateEmployee,
                 btnDeleteEmployee, btnNextEmployee);
+
+
 
 
         btnCreateEmployee.setOnAction(e -> {
@@ -438,8 +452,27 @@ public class HelloApplication extends Application {
             navigateToEmployee(currentEmployeeIndex - 1);
         });
 
+        HBox rowSearchEmp = new HBox(10);
+        rowSearchEmp.setStyle("-fx-background-color: #87CEEB;");
+        rowSearchEmp.setPadding(new Insets(10,10,10,10));
+        rowSearchEmp.setHgrow(lblOutput, Priority.ALWAYS);
+        rowSearchEmp.setAlignment(Pos.CENTER);
+        final Label lblSearchEmp = new Label("Find Employee by ID");
+        lblSearchEmp.setPadding(new Insets(5,0,0,0));
+        final TextField txtSearchEmp = new TextField();
+        final Button btnSearchEmp = new Button("Find Employee");
+        txtSearchEmp.setMinWidth(220);
+        rowSearchEmp.getChildren().addAll(lblSearchEmp, txtSearchEmp, btnSearchEmp);
+
+        // TODO - Search Employee button
+        btnSearchEmp.setOnAction(e -> {
+            // remove println when done
+            System.out.println("Search Employee - by id");
+        });
+
+
         rootBox.getChildren().addAll(rowName, rowEmail, rowPhone,  rowDepartment, rowSalary,  rowPosition,
-                rowButtons, rowOutput);
+                rowButtons, rowOutput, rowSearchEmp);
 
         VBox payrollBox = new VBox(10);
         TitledPane payrollPane = new TitledPane("Payroll Details (Common Navigation)", payrollBox); // 6D Update
@@ -453,6 +486,7 @@ public class HelloApplication extends Application {
         if (currentEmployee != null) {
             lblPayNameValue.setText(currentEmployee.getName());
         }
+        rowPayName.setAlignment(Pos.CENTER);
         rowPayName.getChildren().addAll(lblPayName, lblPayNameValue);
 
         HBox rowRegularRate = new HBox(10);
@@ -463,6 +497,8 @@ public class HelloApplication extends Application {
         if (currentEmployee != null) {
             payRegularRate.setText(String.valueOf(currentEmployee.payroll.getRegularRate()));
         }
+        rowRegularRate.setAlignment(Pos.CENTER);
+        lblRegularRate.setPadding(new Insets(5,0,0,0));
         rowRegularRate.getChildren().addAll(lblRegularRate, payRegularRate);
 
         HBox rowRegularHours = new HBox(10);
@@ -473,6 +509,8 @@ public class HelloApplication extends Application {
         if (currentEmployee != null) {
             payRegularHours.setText(String.valueOf(currentEmployee.payroll.getRegularHours()));
         }
+        lblRegularHours.setPadding(new Insets(5,0,0,0));
+        rowRegularHours.setAlignment(Pos.CENTER);
         rowRegularHours.getChildren().addAll(lblRegularHours, payRegularHours);
 
         HBox rowOvertimeRate = new HBox(10);
@@ -483,6 +521,8 @@ public class HelloApplication extends Application {
         if (currentEmployee != null) {
             payOvertimeRate.setText(String.valueOf(currentEmployee.payroll.getOvertimeRate()));
         }
+        lblOvertimeRate.setPadding(new Insets(5,0,0,0));
+        rowOvertimeRate.setAlignment(Pos.CENTER);
         rowOvertimeRate.getChildren().addAll(lblOvertimeRate, payOvertimeRate);
 
         HBox rowOvertimeHours = new HBox(10);
@@ -493,6 +533,8 @@ public class HelloApplication extends Application {
         if (currentEmployee != null) {
             payOvertimeHours.setText(String.valueOf(currentEmployee.payroll.getOvertimeHours()));
         }
+        rowOvertimeHours.setAlignment(Pos.CENTER);
+        lblOvertimeHours.setPadding(new Insets(5,0,0,0));
         rowOvertimeHours.getChildren().addAll(lblOvertimeHours, payOvertimeHours);
 
         HBox rowBonus = new HBox(10);
@@ -503,26 +545,35 @@ public class HelloApplication extends Application {
         if (currentEmployee != null) {
             payBonus.setText(String.valueOf(currentEmployee.payroll.getBonus()));
         }
+        rowBonus.setAlignment(Pos.CENTER);
+        lblBonus.setPadding(new Insets(5,0,0,0));
+        payBonus.setMinWidth(390);
         rowBonus.getChildren().addAll(lblBonus, payBonus);
 
         HBox rowTaxPercentage = new HBox(10);
         rowTaxPercentage.setStyle("-fx-background-color: #87CEEB;");
         rowTaxPercentage.setPadding(new Insets(10,10,10,10));
         rowTaxPercentage.setHgrow(payTaxPercentage, Priority.ALWAYS);
-        payTaxPercentage.setMaxWidth(300);
+        payTaxPercentage.setMaxWidth(330);
         if (currentEmployee != null) {
             payTaxPercentage.setText(String.valueOf(currentEmployee.payroll.getTaxPercentage()));
         }
+        rowTaxPercentage.setAlignment(Pos.CENTER);
+        lblTaxPercentage.setPadding(new Insets(5,0,0,0));
+        payTaxPercentage.setMinWidth(330);
         rowTaxPercentage.getChildren().addAll(lblTaxPercentage, payTaxPercentage);
 
         HBox rowDeductions = new HBox(10);
         rowDeductions.setStyle("-fx-background-color: lightblue;");
         rowDeductions.setPadding(new Insets(10,10,10,10));
         rowDeductions.setHgrow(payDeductions, Priority.ALWAYS);
-        payDeductions.setMaxWidth(300);
+        payDeductions.setMaxWidth(330);
         if (currentEmployee != null) {
             payDeductions.setText(String.valueOf(currentEmployee.payroll.getDeductions()));
         }
+        rowDeductions.setAlignment(Pos.CENTER);
+        lblDeductions.setPadding(new Insets(5,0,0,0));
+        payDeductions.setMinWidth(330);
         rowDeductions.getChildren().addAll(lblDeductions, payDeductions);
 
         HBox rowPayrollOutput = new HBox(10);
@@ -537,10 +588,28 @@ public class HelloApplication extends Application {
         rowPayrollButtons.setPadding(new Insets(10,10,10,10));
         rowPayrollButtons.setAlignment(Pos.CENTER);
         // Changed to reflect "unambiguous separation" of controls (6B)
-        rowPayrollButtons.getChildren().addAll(btnPayrollPrevEmployee, btnSavePayroll, btnCalculateSalaries, btnCalculateTaxes, btnCalculateDeductions, btnPayrollNextEmployee);
+        rowPayrollButtons.getChildren().addAll(btnPayrollPrevEmployee, btnSavePayroll, btnCalculateSalaries,
+                btnCalculateTaxes, btnCalculateDeductions, btnPayrollNextEmployee);
 
-        payrollBox.getChildren().addAll(rowPayName, rowRegularRate, rowRegularHours, rowOvertimeRate, rowOvertimeHours, rowBonus, rowTaxPercentage, rowDeductions, rowPayrollButtons, rowPayrollOutput);
+        HBox rowSearchPayroll = new HBox(10);
+        rowSearchPayroll.setStyle("-fx-background-color: #87CEEB;");
+        rowSearchPayroll.setPadding(new Insets(10,10,10,10));
+        rowSearchPayroll.setHgrow(lblPayrollOutput, Priority.ALWAYS);
+        rowSearchPayroll.setAlignment(Pos.CENTER);
+        final Label lblSearchPayroll = new Label("Search Payroll by id:");
+        final TextField txtSearchPayroll = new TextField();
+        txtSearchPayroll.setMinWidth(300);
+        final Button btnSearchPayroll = new Button("Search Payroll by id");
+        rowSearchPayroll.getChildren().addAll(lblSearchPayroll, txtSearchPayroll, btnSearchPayroll);
+
+        payrollBox.getChildren().addAll(rowPayName, rowRegularRate, rowRegularHours, rowOvertimeRate, rowOvertimeHours,
+                rowBonus, rowTaxPercentage, rowDeductions, rowPayrollButtons, rowPayrollOutput, rowSearchPayroll);
         // payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
+
+        btnSearchPayroll.setOnAction(e -> {
+            System.out.println("Search Payroll by id: ");
+        });
+
 
         btnPayrollNextEmployee.setOnAction(e -> {
             navigateToEmployee(currentEmployeeIndex + 1);
@@ -644,10 +713,13 @@ public class HelloApplication extends Application {
         rowReportingResults.getChildren().add(txtReportingResults);
 
         HBox rowReportingButtons = new HBox(10);
+        final Button btnSaveEmpReport = new Button("Save Employee Report");
+        final Button btnSaveDeptReport = new Button("Save Department Report");
+
         rowReportingButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowReportingButtons.setPadding(new Insets(10,10,10,10));
         rowReportingButtons.setAlignment(Pos.CENTER);
-        rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport);
+        rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport,  btnSaveEmpReport, btnSaveDeptReport);
 
         HBox rowIndividualEmployee = new HBox(10);
         rowIndividualEmployee.setStyle("-fx-background-color: #E5E4E2;");
@@ -667,8 +739,17 @@ public class HelloApplication extends Application {
         Button btnDepartmentName = new Button("Generate Department Report");
         rowIndividualDepartment.getChildren().addAll(lblDepartmentName,  txtDepartmentName, btnDepartmentName);
 
-
         reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons,  rowIndividualEmployee, rowIndividualDepartment);
+
+        // TODO implement Save Employee Report button
+        btnSaveEmpReport.setOnAction(e -> {
+            System.out.println("Save Employee Report");
+        });
+
+        // TODO implement Save Department Report button
+        btnSaveDeptReport.setOnAction(e -> {
+            System.out.println("Save Department Report");
+        });
 
         btnEmployeeID.setOnAction(e -> {
             System.out.println("Employee ID: " + txtEmployeeID.getText());
@@ -771,11 +852,14 @@ public class HelloApplication extends Application {
         // Separation of concerns/screens
         accordion.getPanes().addAll(employeesPane, payrollPane, reportingPane);
 
-        Scene scene = new Scene(accordion,1000, 700);
+        Scene scene = new Scene(accordion,800, 700);
 
 
-        stage.setMinWidth(1000);
+        stage.setMinWidth(800);
+        stage.setMaxWidth(800);
         stage.setMinHeight(700);
+        stage.setMaxHeight(700);
+        stage.resizableProperty().setValue(false);
         stage.setScene(scene);
         stage.show();
     }
