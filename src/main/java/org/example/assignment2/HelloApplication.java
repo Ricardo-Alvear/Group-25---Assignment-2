@@ -489,7 +489,8 @@ public class HelloApplication extends Application {
             int index = findEmployee(txtSearchEmp.getText());
 
             if (index >= 0) {
-                currentEmployee = employeeList.get(index);
+                currentEmployeeIndex = index;
+                currentEmployee = employeeList.get(currentEmployeeIndex);
                 loadEmployeeDataIntoFields();
                 lblOutput.setText("Found Employee (ID: " + currentEmployee.getId() + ")");
             }
@@ -622,20 +623,27 @@ public class HelloApplication extends Application {
         rowSearchPayroll.setPadding(new Insets(10,10,10,10));
         rowSearchPayroll.setHgrow(lblPayrollOutput, Priority.ALWAYS);
         rowSearchPayroll.setAlignment(Pos.CENTER);
-        final Label lblSearchPayroll = new Label("Search Payroll by id:");
+        final Label lblSearchPayroll = new Label("Search Payroll by Employee Name:");
         final TextField txtSearchPayroll = new TextField();
         txtSearchPayroll.setMinWidth(300);
-        final Button btnSearchPayroll = new Button("Search Payroll by id");
+        final Button btnSearchPayroll = new Button("Search Payroll");
         rowSearchPayroll.getChildren().addAll(lblSearchPayroll, txtSearchPayroll, btnSearchPayroll);
 
         payrollBox.getChildren().addAll(rowPayName, rowRegularRate, rowRegularHours, rowOvertimeRate, rowOvertimeHours,
                 rowBonus, rowTaxPercentage, rowDeductions, rowPayrollButtons, rowPayrollOutput, rowSearchPayroll);
-        // payrollBox.getChildren().addAll(rowPayrollResults, rowPayrollButtons);
 
         btnSearchPayroll.setOnAction(e -> {
-            System.out.println("Search Payroll by id: ");
-        });
+            int index = findEmployee(txtSearchPayroll.getText());
 
+            if (index >= 0) {
+                currentEmployeeIndex = index;
+                currentEmployee = employeeList.get(currentEmployeeIndex);
+                loadEmployeeDataIntoFields();
+                lblPayrollOutput.setText("Found Employee (ID: " + currentEmployee.getId() + ")");
+            }
+            else
+                lblPayrollOutput.setText("No Employees Found");
+        });
 
         btnPayrollNextEmployee.setOnAction(e -> {
             navigateToEmployee(currentEmployeeIndex + 1);
