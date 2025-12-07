@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -78,8 +79,8 @@ public class HelloApplication extends Application {
 
     private final TextArea txtReportingResults = new TextArea();
 
-    private final Button btnCalculateEmpReport = new Button("Calculate Employee Report");
-    private final Button btnCalculateDeptReport = new Button("Calculate Department Report");
+    private final Button btnCalculateEmpReport = new Button("Employee Report");
+    private final Button btnCalculateDeptReport = new Button("Department Report");
 
 
     private final Accordion  accordion = new Accordion();
@@ -815,7 +816,7 @@ public class HelloApplication extends Application {
         rowIndividualEmployee.setAlignment(Pos.CENTER);
         Label lblEmployeeID = new Label("Find Employee by ID");
         TextField txtEmployeeID = new TextField();
-        Button btnEmployeeID = new Button("Generate Employee Report");
+        Button btnEmployeeID = new Button("Employee ID");
         rowIndividualEmployee.getChildren().addAll(lblEmployeeID, txtEmployeeID, btnEmployeeID);
 
         HBox rowIndividualDepartment = new HBox(10);
@@ -824,19 +825,40 @@ public class HelloApplication extends Application {
         rowIndividualDepartment.setAlignment(Pos.CENTER);
         Label lblDepartmentName = new Label("Find Department by Name");
         TextField txtDepartmentName = new TextField();
-        Button btnDepartmentName = new Button("Generate Department Report");
+        Button btnDepartmentName = new Button("Department Name");
         rowIndividualDepartment.getChildren().addAll(lblDepartmentName,  txtDepartmentName, btnDepartmentName);
 
         reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons,  rowIndividualEmployee, rowIndividualDepartment);
 
-        // TODO implement Save Employee Report button
         btnSaveEmpReport.setOnAction(e -> {
             System.out.println("Save Employee Report");
+
+            String employeeReport = GenerateEmployeeReport();
+            txtReportingResults.setText(employeeReport);
+
+            try {
+                FileWriter fw = new FileWriter("employee_report.txt");
+                fw.write(employeeReport);
+                fw.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         // TODO implement Save Department Report button
         btnSaveDeptReport.setOnAction(e -> {
             System.out.println("Save Department Report");
+
+            String departmentReport = GenerateDepartmentReport();
+            txtReportingResults.setText(departmentReport);
+
+            try {
+                FileWriter fw = new FileWriter("department_report.txt");
+                fw.write(departmentReport);
+                fw.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         btnEmployeeID.setOnAction(e -> {
@@ -849,12 +871,76 @@ public class HelloApplication extends Application {
         });
 
         btnCalculateDeptReport.setOnAction(e -> {
-            // 1. Check if there is data
-            if (employeeList == null || employeeList.isEmpty()) {
-                txtReportingResults.setText("No employees available to report.");
-                return;
+            String departmentReport = GenerateDepartmentReport();
+            txtReportingResults.setText(departmentReport);
+        });
+
+        btnCalculateEmpReport.setOnAction(e -> {
+            String employeeReport = GenerateEmployeeReport();
+            txtReportingResults.setText(employeeReport);
+        });
+
+        // Defaults to expanded Employee Pane when app is launched
+        //        accordion.setExpandedPane(employeesPane);
+
+        // Separation of concerns/screens
+        accordion.getPanes().addAll(employeesPane, payrollPane, reportingPane);
+
+        Scene scene = new Scene(accordion,800, 700);
+
+
+        stage.setMinWidth(800);
+        stage.setMaxWidth(800);
+        stage.setMinHeight(700);
+        stage.setMaxHeight(700);
+        stage.resizableProperty().setValue(false);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public String GenerateEmployeeReport() {
+        if (employeeList == null || employeeList.isEmpty()) {
+            return "No employees available.\n";
+        }
+        else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("====== INDIVIDUAL EMPLOYEE REPORT ======\n\n");
+
+            for (Employee emp : employeeList) {
+                sb.append("ID: ").append(emp.getId()).append("\n");
+                sb.append("Name: ").append(emp.getName()).append("\n");
+                sb.append("Position: ").append(emp.getPosition()).append("\n");
+
+                // Calculate Net Pay on the fly for the report
+                double gross = emp.getSalary();
+                double tax = 0;
+                double deduct = 0;
+
+                // Check if payroll object exists to get accurate tax/deductions
+                if(emp.payroll != null) {
+                    tax = gross * (emp.payroll.getTaxPercentage() / 100);
+                    deduct = emp.payroll.getDeductions();
+                }
+
+                double netPay = gross - tax - deduct;
+
+                sb.append(String.format("Gross Pay:   $%.2f\n", gross));
+                sb.append(String.format("Taxes:       $%.2f\n", tax));
+                sb.append(String.format("Deductions:  $%.2f\n", deduct));
+                sb.append(String.format("NET PAY:     $%.2f\n", netPay));
+                sb.append("-----------------------------------\n");
             }
 
+            return sb.toString();
+        }
+    }
+
+    public String GenerateDepartmentReport() {
+        // 1. Check if there is data
+        if (employeeList == null || employeeList.isEmpty()) {
+            return "No employees available to report.\n";
+        }
+        else {
             StringBuilder sb = new StringBuilder();
             sb.append("====== DEPARTMENT SUMMARY ======\n\n");
 
@@ -890,66 +976,11 @@ public class HelloApplication extends Application {
                 sb.append(String.format("Total Salary Budget: $%.2f\n", deptTotalSalary));
                 sb.append("Staff List:\n").append(employeesInDept);
                 sb.append("-----------------------------------\n");
+
             }
 
-            // 5. Output to the TextArea
-            txtReportingResults.setText(sb.toString());
-        });
-
-
-        btnCalculateEmpReport.setOnAction(e -> {
-            if (employeeList == null || employeeList.isEmpty()) {
-                txtReportingResults.setText("No employees available.");
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("====== INDIVIDUAL EMPLOYEE REPORT ======\n\n");
-
-            for (Employee emp : employeeList) {
-                sb.append("ID: ").append(emp.getId()).append(" | Name: ").append(emp.getName()).append("\n");
-                sb.append("Position: ").append(emp.getPosition()).append("\n");
-
-                // Calculate Net Pay on the fly for the report
-                double gross = emp.getSalary(); // Assuming salary field holds the Gross Calculation
-                double tax = 0;
-                double deduct = 0;
-
-                // Check if payroll object exists to get accurate tax/deductions
-                if(emp.payroll != null) {
-                    tax = gross * (emp.payroll.getTaxPercentage() / 100);
-                    deduct = emp.payroll.getDeductions(); // Assuming this is the fixed deduction field
-                }
-
-                double netPay = gross - tax - deduct;
-
-                sb.append(String.format("Gross Pay:   $%.2f\n", gross));
-                sb.append(String.format("Taxes:       $%.2f\n", tax));
-                sb.append(String.format("Deductions:  $%.2f\n", deduct));
-                sb.append(String.format("NET PAY:     $%.2f\n", netPay));
-                sb.append("-----------------------------------\n");
-            }
-
-            txtReportingResults.setText(sb.toString());
-        });
-
-
-        // Defaults to expanded Employee Pane when app is launched
-        //        accordion.setExpandedPane(employeesPane);
-
-        // Separation of concerns/screens
-        accordion.getPanes().addAll(employeesPane, payrollPane, reportingPane);
-
-        Scene scene = new Scene(accordion,800, 700);
-
-
-        stage.setMinWidth(800);
-        stage.setMaxWidth(800);
-        stage.setMinHeight(700);
-        stage.setMaxHeight(700);
-        stage.resizableProperty().setValue(false);
-        stage.setScene(scene);
-        stage.show();
+            return sb.toString();
+        }
     }
 
     public ArrayList<Employee> readEmployeeData() {
