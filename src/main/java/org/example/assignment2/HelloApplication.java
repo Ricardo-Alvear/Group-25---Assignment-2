@@ -166,52 +166,6 @@ public class HelloApplication extends Application {
         }
     }
 
-
-    private String generateCompanyReportString() {
-        if (employeeList == null || employeeList.isEmpty()) {
-            return "No employees to report.";
-        }
-
-        int totalEmployees = employeeList.size();
-
-        Set<String> departments = new HashSet<>();
-        double totalPayrollCost = 0;
-
-        for (Employee emp : employeeList) {
-            departments.add(emp.getDepartment());
-            totalPayrollCost += emp.getSalary();
-        }
-
-        double averageSalary = totalEmployees > 0 ? totalPayrollCost / totalEmployees : 0;
-        int totalDepartments = departments.size();
-
-        StringBuilder report = new StringBuilder();
-        report.append("========== COMPANY REPORT ==========\n\n");
-        report.append("Total Employees: ").append(totalEmployees).append("\n");
-        report.append("Total Departments: ").append(totalDepartments).append("\n");
-        report.append(String.format("Total Payroll Cost: $%.2f\n", totalPayrollCost));
-        report.append(String.format("Average Salary: $%.2f\n", averageSalary));
-        report.append("\n------------------------------------\n");
-
-        report.append("Departments:\n");
-        for (String dept : departments) {
-            report.append("- ").append(dept).append("\n");
-        }
-
-        report.append("------------------------------------\n");
-        report.append("Employees:\n");
-        for (Employee emp : employeeList) {
-            report.append(emp.getName())
-                    .append(" | ")
-                    .append(emp.getDepartment())
-                    .append(" | $")
-                    .append(String.format("%.2f", emp.getSalary()))
-                    .append("\n");
-        }
-
-        return report.toString();
-    }
-
     private boolean validateInputs() {
         boolean isValid = true;
         StringBuilder validationMessage = new StringBuilder();
@@ -802,13 +756,11 @@ public class HelloApplication extends Application {
         final Button btnSaveEmpReport = new Button("Save Employee Report");
         final Button btnSaveDeptReport = new Button("Save Department Report");
 
-
         rowReportingButtons.setStyle("-fx-background-color: #E5E4E2;");
         rowReportingButtons.setPadding(new Insets(10,10,10,10));
         rowReportingButtons.setAlignment(Pos.CENTER);
-        final Button btnExportAllData = new Button("Export All Data (JSON)");
-        btnExportAllData.setOnAction(e -> handleExportAllData());
-        rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport,  btnSaveEmpReport, btnSaveDeptReport, btnExportAllData);
+        Button btnSaveCompanyReport = new Button("Save Company Report");
+        rowReportingButtons.getChildren().addAll(btnCalculateEmpReport, btnCalculateDeptReport,  btnSaveEmpReport, btnSaveDeptReport, btnSaveCompanyReport);
 
         HBox rowIndividualEmployee = new HBox(10);
         rowIndividualEmployee.setStyle("-fx-background-color: #E5E4E2;");
@@ -845,7 +797,6 @@ public class HelloApplication extends Application {
             }
         });
 
-        // TODO implement Save Department Report button
         btnSaveDeptReport.setOnAction(e -> {
             System.out.println("Save Department Report");
 
@@ -861,10 +812,24 @@ public class HelloApplication extends Application {
             }
         });
 
+        btnSaveCompanyReport.setOnAction(e -> {
+            System.out.println("Save Company Report");
+
+            String companyReport = GenerateCompanyReport();
+            txtReportingResults.setText(companyReport);
+
+            try {
+                FileWriter fw = new FileWriter("company_report.txt");
+                fw.write(companyReport);
+                fw.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
         btnEmployeeID.setOnAction(e -> {
             System.out.println("Employee ID: " + txtEmployeeID.getText());
         });
-
 
         btnDepartmentName.setOnAction(e -> {
             System.out.println("Department Name: " + txtDepartmentName.getText());
@@ -942,7 +907,7 @@ public class HelloApplication extends Application {
         }
         else {
             StringBuilder sb = new StringBuilder();
-            sb.append("====== DEPARTMENT SUMMARY ======\n\n");
+            sb.append("====== DEPARTMENT REPORT ======\n\n");
 
             // 2. Find all unique departments first
             Set<String> uniqueDepartments = new HashSet<>();
@@ -976,42 +941,79 @@ public class HelloApplication extends Application {
                 sb.append(String.format("Total Salary Budget: $%.2f\n", deptTotalSalary));
                 sb.append("Staff List:\n").append(employeesInDept);
                 sb.append("-----------------------------------\n");
-
             }
 
             return sb.toString();
         }
     }
 
-    public ArrayList<Employee> readEmployeeData() {
-//        System.out.println("Reading Employee Data from external JSON file...");
+    private String GenerateCompanyReport() {
+        if (employeeList == null || employeeList.isEmpty()) {
+            return "No employees to report.";
+        }
 
+        int totalEmployees = employeeList.size();
+
+        Set<String> departments = new HashSet<>();
+        double totalPayrollCost = 0;
+
+        for (Employee emp : employeeList) {
+            departments.add(emp.getDepartment());
+            totalPayrollCost += emp.getSalary();
+        }
+
+        double averageSalary = totalEmployees > 0 ? totalPayrollCost / totalEmployees : 0;
+        int totalDepartments = departments.size();
+
+        StringBuilder report = new StringBuilder();
+        report.append("========== COMPANY REPORT ==========\n\n");
+        report.append("Total Employees: ").append(totalEmployees).append("\n");
+        report.append("Total Departments: ").append(totalDepartments).append("\n");
+        report.append(String.format("Total Payroll Cost: $%.2f\n", totalPayrollCost));
+        report.append(String.format("Average Salary: $%.2f\n", averageSalary));
+        report.append("\n------------------------------------\n");
+
+        report.append("Departments:\n");
+        for (String dept : departments) {
+            report.append("- ").append(dept).append("\n");
+        }
+
+        report.append("------------------------------------\n");
+        report.append("Employees:\n");
+        for (Employee emp : employeeList) {
+            report.append(emp.getName())
+                    .append(" | ")
+                    .append(emp.getDepartment())
+                    .append(" | $")
+                    .append(String.format("%.2f", emp.getSalary()))
+                    .append("\n");
+        }
+
+        return report.toString();
+    }
+
+    public ArrayList<Employee> readEmployeeData() {
         ArrayList<Employee> employeeList = new ArrayList<>();
 
         try {
             Gson gson = new Gson();
 
             Type employeeListType = new TypeToken<ArrayList<Employee>>(){}.getType();
-            // Assumes "employees.json" is the external JSON file.
             FileReader reader = new FileReader("employees.json");
 
             employeeList = gson.fromJson(reader, employeeListType);
             reader.close();
 
-//            System.out.println(employeeList.size() + " Employee records read from employees.json");
+            // System.out.println(employeeList.size() + " Employee records read from employees.json");
         }
         catch (Exception e) {
-//            System.out.println("Error Reading Employee Data");
-            e.printStackTrace();
-            employeeList = new ArrayList<>();
+           System.out.println("Error Reading Employee Data");
         }
 
         return employeeList;
     }
 
     public boolean writeEmployeeData(ArrayList<Employee> employeeList) {
-//        System.out.println("Writing Employee Data (synchronizing in-memory DB to JSON file)...");
-
         try {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -1019,13 +1021,11 @@ public class HelloApplication extends Application {
             gson.toJson(employeeList, writer);
 
             writer.close();
-//            System.out.println(employeeList.size() + " Employee records written to employees.json"); // Fix the truncated printout
+            // System.out.println(employeeList.size() + " Employee records written to employees.json"); // Fix the truncated printout
         }
         catch (Exception e) {
-//            System.out.println("Error Writing Employee Data");
-            e.printStackTrace();
+           System.out.println("Error Writing Employee Data");
         }
         return false;
     }
-
 }
