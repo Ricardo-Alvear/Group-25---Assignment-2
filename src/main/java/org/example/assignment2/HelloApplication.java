@@ -704,10 +704,17 @@ public class HelloApplication extends Application {
             double overtimeHours = parseDoubleOrZero(payOvertimeHours);
             double overtimeRate = parseDoubleOrZero(payOvertimeRate);
             double bonus = parseDoubleOrZero(payBonus);
+            double taxPercentage = parseDoubleOrZero(payTaxPercentage) / 100.0;
+            double fixedDeductions = parseDoubleOrZero(payDeductions);
 
-            double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
+            double grossSalary = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
 
-            lblPayrollOutput.setText("Gross Salary: " + String.format("%.2f", income));
+            double calculatedTaxes = grossSalary * taxPercentage;
+            double totalDeductions = calculatedTaxes + fixedDeductions;
+
+            double netSalary = grossSalary -  totalDeductions;
+
+            lblPayrollOutput.setText("Gross Salary: $" + String.format("%.2f", grossSalary) + ", Net Salary: $" + String.format("%.2f", netSalary));
         });
 
         btnCalculateTaxes.setOnAction(e -> {
@@ -721,7 +728,7 @@ public class HelloApplication extends Application {
             double income = (regularHours * regularRate) + (overtimeHours * overtimeRate) + bonus;
             double taxes = income * taxPercentage;
 
-            lblPayrollOutput.setText("Taxes: " + String.format("%.2f", taxes));
+            lblPayrollOutput.setText("Taxes: $" + String.format("%.2f", taxes));
         });
 
         btnCalculateDeductions.setOnAction(e -> {
@@ -739,7 +746,7 @@ public class HelloApplication extends Application {
             // Total deduction is the sum of calculated taxes and fixed deductions
             double totalDeductions = calculatedTaxes + fixedDeductions;
 
-            lblPayrollOutput.setText("Total Deductions (Tax + Fixed): " + String.format("%.2f", totalDeductions));
+            lblPayrollOutput.setText("Total Deductions (Tax + Fixed): $" + String.format("%.2f", totalDeductions));
         });
 
         VBox reportingBox = new VBox(10);
@@ -788,7 +795,7 @@ public class HelloApplication extends Application {
         Button btnDepartmentName = new Button("Department Name");
         rowIndividualDepartment.getChildren().addAll(lblDepartmentName,  txtDepartmentName, btnDepartmentName);
 
-        reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons,  rowIndividualEmployee, rowIndividualDepartment);
+        reportingBox.getChildren().addAll(rowReportingResults, rowReportingButtons);
 
         btnSaveEmpReport.setOnAction(e -> {
             System.out.println("Save Employee Report");
