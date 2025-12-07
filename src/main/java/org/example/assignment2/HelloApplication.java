@@ -189,6 +189,18 @@ public class HelloApplication extends Application {
             isValid = false;
         }
 
+        if (empEmail.getText().trim().isEmpty()) {
+            validationMessage.append("- Email is required.\n");
+            empDepartment.setStyle("-fx-border-color: red;");
+            isValid = false;
+        }
+        else {
+            if (!isValidEmail(empEmail.getText())) {
+                validationMessage.append("- Email is not valid.\n");
+                isValid = false;
+            }
+        }
+
         // --- Payroll Details (Numerical) Validation ---
 
         // Fields that must be non-negative numbers
@@ -223,8 +235,8 @@ public class HelloApplication extends Application {
             lblOutput.setText("Employee Details: Valid");
             lblPayrollOutput.setText("Payroll Details: Valid");
         } else {
-            lblOutput.setText("Employee Details: Errors found. See Payroll Output.");
-            lblPayrollOutput.setText("Validation Errors:\n" + validationMessage.toString());
+            lblOutput.setText("Validation Errors:\n" + validationMessage);
+            lblPayrollOutput.setText("Validation Errors:\n" + validationMessage);
         }
 
         return isValid;
@@ -493,6 +505,7 @@ public class HelloApplication extends Application {
                 currentEmployee = employeeList.get(currentEmployeeIndex);
                 loadEmployeeDataIntoFields();
                 lblOutput.setText("Found Employee (ID: " + currentEmployee.getId() + ")");
+                lblPayrollOutput.setText("Found Employee (ID: " + currentEmployee.getId() + ")");
             }
             else
                 lblOutput.setText("No Employees Found");
@@ -639,6 +652,7 @@ public class HelloApplication extends Application {
                 currentEmployeeIndex = index;
                 currentEmployee = employeeList.get(currentEmployeeIndex);
                 loadEmployeeDataIntoFields();
+                lblOutput.setText("Found Employee (ID: " + currentEmployee.getId() + ")");
                 lblPayrollOutput.setText("Found Employee (ID: " + currentEmployee.getId() + ")");
             }
             else
@@ -984,6 +998,14 @@ public class HelloApplication extends Application {
         }
 
         return report.toString();
+    }
+
+    public boolean isValidEmail(String email) {
+        if (email == null)
+            return false;
+
+        String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(emailPattern);
     }
 
     public int findEmployee(String name) {
