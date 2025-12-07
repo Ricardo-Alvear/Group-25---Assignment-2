@@ -263,20 +263,6 @@ public class HelloApplication extends Application {
             lblPayrollOutput.setText("Showing Employee (ID: " + currentEmployee.getId() + ")");
         }
 
-        // Load Payroll Data
-
-        /*
-        payrollList = readPayrollData();
-
-        currentPayroll = null;
-        currentPayrollIndex = -1;
-
-        if (payrollList != null && !payrollList.isEmpty()) {
-            currentPayroll = payrollList.getFirst();
-            currentPayrollIndex = payrollList.indexOf(currentPayroll);
-        }
-         */
-
         // Main Program
 
         stage.setTitle("Fun Time's HR Management and Payroll Processing!");
@@ -320,7 +306,6 @@ public class HelloApplication extends Application {
         empPhone.setMaxWidth(350);
         rowPhone.setAlignment(Pos.CENTER);
         rowPhone.getChildren().addAll(lblPhone,empPhone);
-
 
         HBox rowDepartment = new HBox(10);
         rowDepartment.setStyle("-fx-background-color: #87CEEB;");
@@ -372,9 +357,6 @@ public class HelloApplication extends Application {
         rowButtons.setAlignment(Pos.CENTER);
         rowButtons.getChildren().addAll(btnPrevEmployee, btnCreateEmployee, btnUpdateEmployee,
                 btnDeleteEmployee, btnNextEmployee);
-
-
-
 
         btnCreateEmployee.setOnAction(e -> {
 
@@ -444,7 +426,6 @@ public class HelloApplication extends Application {
             loadEmployeeDataIntoFields(); // Refresh fields
         });
 
-
         btnDeleteEmployee.setOnAction(e -> {
 
             if (currentEmployee == null) return;
@@ -497,19 +478,24 @@ public class HelloApplication extends Application {
         rowSearchEmp.setPadding(new Insets(10,10,10,10));
         rowSearchEmp.setHgrow(lblOutput, Priority.ALWAYS);
         rowSearchEmp.setAlignment(Pos.CENTER);
-        final Label lblSearchEmp = new Label("Find Employee by ID");
+        final Label lblSearchEmp = new Label("Find Employee by Name");
         lblSearchEmp.setPadding(new Insets(5,0,0,0));
         final TextField txtSearchEmp = new TextField();
         final Button btnSearchEmp = new Button("Find Employee");
         txtSearchEmp.setMinWidth(220);
         rowSearchEmp.getChildren().addAll(lblSearchEmp, txtSearchEmp, btnSearchEmp);
 
-        // TODO - Search Employee button
         btnSearchEmp.setOnAction(e -> {
-            // remove println when done
-            System.out.println("Search Employee - by id");
-        });
+            int index = findEmployee(txtSearchEmp.getText());
 
+            if (index >= 0) {
+                currentEmployee = employeeList.get(index);
+                loadEmployeeDataIntoFields();
+                lblOutput.setText("Found Employee (ID: " + currentEmployee.getId() + ")");
+            }
+            else
+                lblOutput.setText("No Employees Found");
+        });
 
         rootBox.getChildren().addAll(rowName, rowEmail, rowPhone,  rowDepartment, rowSalary,  rowPosition,
                 rowButtons, rowOutput, rowSearchEmp);
@@ -990,6 +976,19 @@ public class HelloApplication extends Application {
         }
 
         return report.toString();
+    }
+
+    public int findEmployee(String name) {
+        String search = name.toLowerCase();
+
+        for (int i = 0; i < employeeList.size(); i++) {
+            Employee employee = employeeList.get(i);
+            if (employee.getName().toLowerCase().contains(search)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     public ArrayList<Employee> readEmployeeData() {
